@@ -1,0 +1,16 @@
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/IPC/LocalPTYConnection.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/IPC/SharedMemoryBuffer.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Models/AccountManager.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/BinaryProtocolEncoder.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/TerminalProtocol.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/TerminalWebSocketClient.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Rendering/OptimizedMetalRenderer.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Rendering/TerminalMetalView.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Terminal/PTYSession.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Terminal/VT100Parser.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/VibeTerminalApp.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/ContentView.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/SettingsView.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/TerminalInputView.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/WorkingTerminalView.swift
+/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/DerivedSources/resource_bundle_accessor.swift

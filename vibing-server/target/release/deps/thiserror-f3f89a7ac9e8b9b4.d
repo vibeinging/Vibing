@@ -1,0 +1,14 @@
+/Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/release/deps/thiserror-f3f89a7ac9e8b9b4.d: /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/lib.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/aserror.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/display.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/var.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/private.rs /Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/release/build/thiserror-6b6cd1bf0f8edeb5/out/private.rs
+
+/Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/release/deps/libthiserror-f3f89a7ac9e8b9b4.rlib: /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/lib.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/aserror.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/display.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/var.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/private.rs /Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/release/build/thiserror-6b6cd1bf0f8edeb5/out/private.rs
+
+/Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/release/deps/libthiserror-f3f89a7ac9e8b9b4.rmeta: /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/lib.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/aserror.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/display.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/var.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/private.rs /Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/release/build/thiserror-6b6cd1bf0f8edeb5/out/private.rs
+
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/lib.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/aserror.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/display.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/var.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/private.rs:
+/Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/release/build/thiserror-6b6cd1bf0f8edeb5/out/private.rs:
+
+# env-dep:OUT_DIR=/Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/release/build/thiserror-6b6cd1bf0f8edeb5/out

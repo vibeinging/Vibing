@@ -1,0 +1,4 @@
+crossbeam_utils::cache_padded::CachePadded<lock_api::rwlock::RwLock<dashmap::lock::RawRwLock, hashbrown::raw::inner::RawTable<(PtySessionId, dashmap::util::SharedValue<Arc<PtySession>>)>>>
+[crossbeam_utils::cache_padded::CachePadded<lock_api::rwlock::RwLock<dashmap::lock::RawRwLock, hashbrown::raw::inner::RawTable<(PtySessionId, dashmap::util::SharedValue<Arc<PtySession>>)>>>]
+Unique<[crossbeam_utils::cache_padded::CachePadded<lock_api::rwlock::RwLock<dashmap::lock::RawRwLock, hashbrown::raw::inner::RawTable<(PtySessionId, dashmap::util::SharedValue<Arc<PtySession>>)>>>]>
+Box<[crossbeam_utils::cache_padded::CachePadded<lock_api::rwlock::RwLock<dashmap::lock::RawRwLock, hashbrown::raw::inner::RawTable<(PtySessionId, dashmap::util::SharedValue<Arc<PtySession>>)>>>]>

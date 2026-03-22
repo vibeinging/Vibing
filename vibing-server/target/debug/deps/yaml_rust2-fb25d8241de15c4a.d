@@ -1,0 +1,11 @@
+/Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/debug/deps/yaml_rust2-fb25d8241de15c4a.d: /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/lib.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/char_traits.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/debug.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/emitter.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/parser.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/scanner.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/yaml.rs
+
+/Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/debug/deps/libyaml_rust2-fb25d8241de15c4a.rmeta: /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/lib.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/char_traits.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/debug.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/emitter.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/parser.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/scanner.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/yaml.rs
+
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/lib.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/char_traits.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/debug.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/emitter.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/parser.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/scanner.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.10.4/src/yaml.rs:

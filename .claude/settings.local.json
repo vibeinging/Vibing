@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(git clone:*)",
+      "Bash(wc -l wezterm-gui/src/*.rs)",
+      "Bash(git init:*)",
+      "Bash(git remote:*)"
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+/Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/release/deps/toml_datetime-285685a4b5565e3e.d: /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/lib.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/datetime.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/de.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/ser.rs
+
+/Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/release/deps/libtoml_datetime-285685a4b5565e3e.rlib: /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/lib.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/datetime.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/de.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/ser.rs
+
+/Volumes/NBDATA/PersonalProjects/YiY/vibing-server/target/release/deps/libtoml_datetime-285685a4b5565e3e.rmeta: /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/lib.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/datetime.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/de.rs /Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/ser.rs
+
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/lib.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/datetime.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/de.rs:
+/Users/Four/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/toml_datetime-1.0.1+spec-1.1.0/src/ser.rs:

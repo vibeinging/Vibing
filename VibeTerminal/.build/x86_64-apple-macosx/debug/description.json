@@ -1,0 +1,549 @@
+{
+  "builtTestProducts" : [
+
+  ],
+  "copyCommands" : {
+    "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal_VibeTerminal.bundle/Shaders.metal" : {
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Resources/Shaders.metal"
+        }
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal_VibeTerminal.bundle/Shaders.metal"
+        }
+      ]
+    }
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.VibeTerminal-x86_64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "fileList" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/sources",
+      "importPath" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/IPC/LocalPTYConnection.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/IPC/SharedMemoryBuffer.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Models/AccountManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/BinaryProtocolEncoder.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/TerminalProtocol.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/TerminalWebSocketClient.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Rendering/OptimizedMetalRenderer.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Rendering/TerminalMetalView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Terminal/PTYSession.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Terminal/VT100Parser.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/VibeTerminalApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/SettingsView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/TerminalInputView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/WorkingTerminalView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/DerivedSources/resource_bundle_accessor.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<VibeTerminal-x86_64-apple-macosx15.0-debug.module-resources>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "VibeTerminal",
+      "moduleOutputPath" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/Modules/VibeTerminal.swiftmodule",
+      "objects" : [
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/LocalPTYConnection.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/SharedMemoryBuffer.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/AccountManager.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/BinaryProtocolEncoder.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/TerminalProtocol.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/TerminalWebSocketClient.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/OptimizedMetalRenderer.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/TerminalMetalView.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/PTYSession.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/VT100Parser.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/VibeTerminalApp.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/ContentView.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/SettingsView.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/TerminalInputView.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/WorkingTerminalView.swift.o",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/resource_bundle_accessor.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "x86_64-apple-macosx13.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j12",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE",
+        "-module-cache-path",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "VibeTerminal_main",
+        "-swift-version",
+        "5",
+        "-Xcc",
+        "-DIOKIT_DEPRECATED=1",
+        "-Xcc",
+        "-I/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal",
+        "-I",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-L",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-plugin-path",
+        "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "vibeterminal"
+      ],
+      "outputFileMapPath" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/LocalPTYConnection.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/SharedMemoryBuffer.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/AccountManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/BinaryProtocolEncoder.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/TerminalProtocol.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/TerminalWebSocketClient.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/OptimizedMetalRenderer.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/TerminalMetalView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/PTYSession.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/VT100Parser.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/VibeTerminalApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/SettingsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/TerminalInputView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/WorkingTerminalView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/resource_bundle_accessor.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/Modules/VibeTerminal.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/IPC/LocalPTYConnection.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/IPC/SharedMemoryBuffer.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Models/AccountManager.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/BinaryProtocolEncoder.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/TerminalProtocol.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/TerminalWebSocketClient.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Rendering/OptimizedMetalRenderer.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Rendering/TerminalMetalView.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Terminal/PTYSession.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Terminal/VT100Parser.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/VibeTerminalApp.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/ContentView.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/SettingsView.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/TerminalInputView.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/WorkingTerminalView.swift",
+        "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/DerivedSources/resource_bundle_accessor.swift"
+      ],
+      "tempsPath" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "VibeTerminal" : [
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "-module-name",
+      "VibeTerminal",
+      "-package-name",
+      "vibeterminal",
+      "-c",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/IPC/LocalPTYConnection.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/IPC/SharedMemoryBuffer.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Models/AccountManager.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/BinaryProtocolEncoder.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/TerminalProtocol.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/TerminalWebSocketClient.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Rendering/OptimizedMetalRenderer.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Rendering/TerminalMetalView.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Terminal/PTYSession.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Terminal/VT100Parser.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/VibeTerminalApp.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/ContentView.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/SettingsView.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/TerminalInputView.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/WorkingTerminalView.swift",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/DerivedSources/resource_bundle_accessor.swift",
+      "-I",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/Modules",
+      "-target",
+      "x86_64-apple-macosx13.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j12",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE",
+      "-module-cache-path",
+      "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "VibeTerminal_main",
+      "-swift-version",
+      "5",
+      "-Xcc",
+      "-DIOKIT_DEPRECATED=1",
+      "-Xcc",
+      "-I/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal",
+      "-I",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-L",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-plugin-path",
+      "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "vibeterminal",
+      "-driver-use-frontend-path",
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "VibeTerminal" : [
+
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal-entitlement.plist" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<entitlement-plist>"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<com.apple.security.get-task-allow>"
+        }
+      ],
+      "outputFilePath" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal-entitlement.plist"
+    },
+    "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/IPC/LocalPTYConnection.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/IPC/SharedMemoryBuffer.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Models/AccountManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/BinaryProtocolEncoder.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/TerminalProtocol.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Network/TerminalWebSocketClient.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Rendering/OptimizedMetalRenderer.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Rendering/TerminalMetalView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Terminal/PTYSession.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Terminal/VT100Parser.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/VibeTerminalApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/SettingsView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/TerminalInputView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/Views/WorkingTerminalView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/DerivedSources/resource_bundle_accessor.swift"
+        }
+      ],
+      "outputFilePath" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/sources"
+    },
+    "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/AccountManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/BinaryProtocolEncoder.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/LocalPTYConnection.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/OptimizedMetalRenderer.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/PTYSession.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/SettingsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/SharedMemoryBuffer.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/TerminalInputView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/TerminalMetalView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/TerminalProtocol.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/TerminalWebSocketClient.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/VT100Parser.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/VibeTerminalApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/WorkingTerminalView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.build/resource_bundle_accessor.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/VibeTerminal.product/Objects.LinkFileList"
+    },
+    "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Volumes/NBDATA/PersonalProjects/YiY/VibeTerminal/.build/x86_64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+    }
+  }
+}
