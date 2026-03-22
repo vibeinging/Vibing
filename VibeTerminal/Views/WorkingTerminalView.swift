@@ -10,7 +10,7 @@ import AppKit
 
 struct WorkingTerminalView: View {
     @StateObject private var viewModel = TerminalViewModel(cols: 120, rows: 36)
-    @StateObject private var inputHandlerState = InputHandlerState()
+    @StateObject private var sessionManager = TerminalSessionManager()
 
     var body: some View {
         ZStack {
@@ -20,11 +20,11 @@ struct WorkingTerminalView: View {
             // Metal 渲染的终端内容
             TerminalMetalView(viewModel: viewModel)
 
-            // 隐藏的键盘捕获层（几乎透明）
+            // 键盘捕获层
             TerminalInputView(viewModel: viewModel) { keyPress in
-                inputHandlerState.handleKeyPress(keyPress)
+                sessionManager.handleKeyPress(keyPress)
             }
-            .frame(width: 0, height: 0)  // 不占用空间
+            .frame(width: 0, height: 0)
             .contentShape(Rectangle())
 
             // 欢迎提示（未连接时显示）
@@ -37,9 +37,12 @@ struct WorkingTerminalView: View {
         .onAppear {
             becomeFirstResponder()
             // 自动启动会话
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 startSession()
             }
+        }
+        .onDisappear {
+            sessionManager.disconnect()
         }
     }
 
@@ -52,18 +55,86 @@ struct WorkingTerminalView: View {
     }
 
     private func startSession() {
-        // TODO: 连接到后端服务器启动 PTY 会话
-        viewModel.isConnected = true
+        sessionManager.connect { [weak viewModel] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let session):
+                    viewModel?.connect(session: session)
+                    viewModel?.isConnected = true
+                case .failure(let error):
+                    print("Failed to connect: \(error)")
+                    // 显示错误信息
+                }
+            }
+        }
     }
 }
 
-// MARK: - 输入处理器状态
+// MARK: - 会话管理器
 
-class InputHandlerState: ObservableObject {
-    private let handler = TerminalInputHandler()
+class TerminalSessionManager: ObservableObject {
+    private var ptySession: PTYSession?
+    private let inputHandler = TerminalInputHandler()
+    private var delegateHolder: SessionDelegate?
+
+    func connect(completion: @escaping (Result<PTYSession, Error>) -> Void) {
+        // 连接到本地后端服务器
+        let serverURL = URL(string: "http://localhost:8080")!
+
+        let session = PTYSession(serverURL: serverURL, config: .default)
+        self.ptySession = session
+        self.inputHandler.session = session
+
+        // 保持对委托的强引用
+        let delegate = SessionDelegate { [weak self] frame in
+            self?.handleFrame(frame)
+        }
+        self.delegateHolder = delegate
+        session.delegate = delegate
+
+        session.connect()
+
+        // 延迟返回成功，等待连接建立
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            completion(.success(session))
+        }
+    }
+
+    func disconnect() {
+        ptySession = nil
+        inputHandler.session = nil
+        delegateHolder = nil
+    }
 
     func handleKeyPress(_ keyPress: KeyPress) -> Bool {
-        return handler.handleKeyPress(keyPress)
+        return inputHandler.handleKeyPress(keyPress)
+    }
+
+    private func handleFrame(_ frame: TerminalFrame) {
+        // 帧将由 PTYSession 的 delegate 处理
+        // 这里可以添加额外的处理逻辑
+    }
+}
+
+// MARK: - 会话委托
+
+class SessionDelegate: PTYSessionDelegate {
+    private let onFrame: (TerminalFrame) -> Void
+
+    init(onFrame: @escaping (TerminalFrame) -> Void) {
+        self.onFrame = onFrame
+    }
+
+    func session(_ session: PTYSession, didReceiveFrame frame: TerminalFrame) {
+        onFrame(frame)
+    }
+
+    func session(_ session: PTYSession, didChangeState state: PTYSession.State) {
+        print("Session state changed: \(state)")
+    }
+
+    func session(_ session: PTYSession, didReceiveError error: Error) {
+        print("Session error: \(error)")
     }
 }
 

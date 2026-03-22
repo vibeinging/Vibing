@@ -154,6 +154,83 @@ class TerminalViewModel: ObservableObject {
     func notifyInputReceived() {
         hasPendingUpdates = true
     }
+
+    // MARK: - 会话连接
+
+    private var ptySession: PTYSession?
+    private var sessionDelegate: TerminalViewModelDelegate?
+
+    func connect(session: PTYSession) {
+        self.ptySession = session
+        // 创建并保存委托，防止被释放
+        let delegate = TerminalViewModelDelegate(viewModel: self)
+        self.sessionDelegate = delegate
+        session.delegate = delegate
+    }
+
+    func disconnect() {
+        ptySession = nil
+        sessionDelegate = nil
+        isConnected = false
+    }
+}
+
+// MARK: - 终端视图模型委托
+
+class TerminalViewModelDelegate: PTYSessionDelegate {
+    weak var viewModel: TerminalViewModel?
+
+    init(viewModel: TerminalViewModel) {
+        self.viewModel = viewModel
+    }
+
+    func session(_ session: PTYSession, didReceiveFrame frame: TerminalFrame) {
+        // 更新终端状态
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self, let viewModel = self.viewModel else { return }
+
+            // 应用帧到终端状态
+            for cell in frame.cells {
+                let x = Int(cell.x)
+                let y = Int(cell.y)
+                if x < viewModel.terminalState.cols && y < viewModel.terminalState.rows {
+                    let fgColor = SIMD4<UInt8>(cell.fgR, cell.fgG, cell.fgB, 255)
+                    let bgColor = SIMD4<UInt8>(cell.bgR, cell.bgG, cell.bgB, 255)
+                    viewModel.updateCell(
+                        char: cell.char.first ?? " ",
+                        x: x,
+                        y: y,
+                        fgColor: fgColor,
+                        bgColor: bgColor,
+                        attrs: cell.attrs
+                    )
+                }
+            }
+
+            // 更新光标位置
+            viewModel.cursorPosition = CGPoint(
+                x: CGFloat(frame.cursorX),
+                y: CGFloat(frame.cursorY)
+            )
+        }
+    }
+
+    func session(_ session: PTYSession, didChangeState state: PTYSession.State) {
+        DispatchQueue.main.async { [weak self] in
+            switch state {
+            case .connected:
+                self?.viewModel?.isConnected = true
+            case .disconnected, .failed:
+                self?.viewModel?.isConnected = false
+            default:
+                break
+            }
+        }
+    }
+
+    func session(_ session: PTYSession, didReceiveError error: Error) {
+        print("PTY Session error: \(error)")
+    }
 }
 
 // MARK: - Metal Renderer
