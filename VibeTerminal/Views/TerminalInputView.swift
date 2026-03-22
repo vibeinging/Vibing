@@ -2,37 +2,40 @@
 //  TerminalInputView.swift
 //  VibeTerminal
 //
-//  终端键盘输入处理 - 使用 NSViewController 和 NSEvent
+//  终端键盘输入处理 - 使用 SwiftUI 原生事件
 //
 
 import SwiftUI
 import AppKit
 
-// MARK: - 终端输入视图（NSViewRepresentable）
+// MARK: - 终端输入视图
 
 struct TerminalInputView: NSViewRepresentable {
     @ObservedObject var viewModel: TerminalViewModel
     let onKeyPress: (KeyPress) -> Bool
 
-    func makeNSView(context: Context) -> TerminalInputNSView {
-        let view = TerminalInputNSView()
+    func makeNSView(context: Context) -> NSTextView {
+        let view = TerminalTextView()
         view.viewModel = viewModel
         view.onKeyPress = onKeyPress
         return view
     }
 
-    func updateNSView(_ nsView: TerminalInputNSView, context: Context) {
-        nsView.viewModel = viewModel
+    func updateNSView(_ nsView: NSTextView, context: Context) {
+        if let terminalView = nsView as? TerminalTextView {
+            terminalView.viewModel = viewModel
+        }
     }
 }
 
-// MARK: - 终端输入 NSView
+// MARK: - 终端 TextView（处理键盘输入）
 
-class TerminalInputNSView: NSView {
+class TerminalTextView: NSTextView {
     weak var viewModel: TerminalViewModel?
     var onKeyPress: ((KeyPress) -> Bool)?
 
     override var acceptsFirstResponder: Bool { true }
+    override var isEditable: Bool { false }  // 不允许编辑，只接收键盘
 
     override func keyDown(with event: NSEvent) -> Bool {
         guard let handler = onKeyPress else {
@@ -43,34 +46,31 @@ class TerminalInputNSView: NSView {
         let handled = handler(keyPress)
 
         if handled {
-            // 通知 viewModel 有新输入 - 通过公开方法
             viewModel?.notifyInputReceived()
         }
 
         return handled
     }
 
-    override func flagsChanged(with event: NSEvent) {
-        // 处理修饰键变化（Ctrl, Alt, Shift 等）
-        super.flagsChanged(with: event)
-    }
-
-    override func becomeFirstResponder() -> Bool {
+    override func becomeFirstResponder() -> Bool? {
         let result = super.becomeFirstResponder()
-        if result {
-            // 隐藏系统光标
+        if result != nil {
             NSCursor.hide()
         }
         return result
     }
 
-    override func resignFirstResponder() -> Bool {
+    override func resignFirstResponder() -> Bool? {
         let result = super.resignFirstResponder()
-        if result {
-            // 显示系统光标
+        if result != nil {
             NSCursor.unhide()
         }
         return result
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        // 不绘制，由 Metal 处理
+        super.draw(dirtyRect)
     }
 }
 
@@ -160,14 +160,14 @@ struct KeyPress {
             self.key = .f(UInt8(nsEvent.keyCode - 122 + 1))
             self.characters = encodeFKey(UInt8(nsEvent.keyCode - 122 + 1))
 
-        case 0...11: // F5-F12 (需要映射)
-            self.key = .unknown
-            self.characters = nsEvent.characters
+        case 0...11: // F5-F12
+            self.key = .f(UInt8(nsEvent.keyCode + 5))
+            self.characters = encodeFKey(UInt8(nsEvent.keyCode + 5))
 
         default:
-            if let chars = nsEvent.characters, let char = chars.first {
+            if let chars = nsEvent.charactersIgnoringModifiers, let char = chars.first {
                 self.key = .character(char)
-                self.characters = chars
+                self.characters = String(char)
             } else {
                 self.key = .unknown
                 self.characters = nil
