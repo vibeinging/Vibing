@@ -2,7 +2,7 @@
 //  TerminalInputView.swift
 //  VibeTerminal
 //
-//  终端键盘输入处理 - 使用 SwiftUI 原生事件
+//  终端键盘输入处理
 //
 
 import SwiftUI
@@ -14,32 +14,30 @@ struct TerminalInputView: NSViewRepresentable {
     @ObservedObject var viewModel: TerminalViewModel
     let onKeyPress: (KeyPress) -> Bool
 
-    func makeNSView(context: Context) -> NSTextView {
-        let view = TerminalTextView()
+    func makeNSView(context: Context) -> TerminalInputNSView {
+        let view = TerminalInputNSView()
         view.viewModel = viewModel
         view.onKeyPress = onKeyPress
         return view
     }
 
-    func updateNSView(_ nsView: NSTextView, context: Context) {
-        if let terminalView = nsView as? TerminalTextView {
-            terminalView.viewModel = viewModel
-        }
+    func updateNSView(_ nsView: TerminalInputNSView, context: Context) {
+        nsView.viewModel = viewModel
     }
 }
 
-// MARK: - 终端 TextView（处理键盘输入）
+// MARK: - 终端输入 NSView
 
-class TerminalTextView: NSTextView {
+class TerminalInputNSView: NSView {
     weak var viewModel: TerminalViewModel?
     var onKeyPress: ((KeyPress) -> Bool)?
 
     override var acceptsFirstResponder: Bool { true }
-    override var isEditable: Bool { false }  // 不允许编辑，只接收键盘
 
-    override func keyDown(with event: NSEvent) -> Bool {
+    override func keyDown(with event: NSEvent) {
         guard let handler = onKeyPress else {
-            return super.keyDown(with: event)
+            super.keyDown(with: event)
+            return
         }
 
         let keyPress = KeyPress(nsEvent: event)
@@ -49,28 +47,26 @@ class TerminalTextView: NSTextView {
             viewModel?.notifyInputReceived()
         }
 
-        return handled
+        // 如果没有处理，传递给父类
+        if !handled {
+            super.keyDown(with: event)
+        }
     }
 
-    override func becomeFirstResponder() -> Bool? {
+    override func becomeFirstResponder() -> Bool {
         let result = super.becomeFirstResponder()
-        if result != nil {
+        if result {
             NSCursor.hide()
         }
         return result
     }
 
-    override func resignFirstResponder() -> Bool? {
+    override func resignFirstResponder() -> Bool {
         let result = super.resignFirstResponder()
-        if result != nil {
+        if result {
             NSCursor.unhide()
         }
         return result
-    }
-
-    override func draw(_ dirtyRect: NSRect) {
-        // 不绘制，由 Metal 处理
-        super.draw(dirtyRect)
     }
 }
 
@@ -160,7 +156,7 @@ struct KeyPress {
             self.key = .f(UInt8(nsEvent.keyCode - 122 + 1))
             self.characters = encodeFKey(UInt8(nsEvent.keyCode - 122 + 1))
 
-        case 0...11: // F5-F12
+        case 0...11: // F5-F12 (实际 keyCode 不同)
             self.key = .f(UInt8(nsEvent.keyCode + 5))
             self.characters = encodeFKey(UInt8(nsEvent.keyCode + 5))
 
@@ -173,19 +169,6 @@ struct KeyPress {
                 self.characters = nil
             }
         }
-    }
-
-    private func encodeFKey(_ n: UInt8) -> String {
-        let codes: [String] = [
-            "OP", "OQ", "OR", "OS",  // F1-F4
-            "[15~", "[17~", "[18~", "[19~",  // F5-F8
-            "[20~", "[21~", "[23~", "[24~"   // F9-F12
-        ]
-        let index = Int(n - 1)
-        if index < codes.count {
-            return "\u{1B}\(codes[index])"
-        }
-        return ""
     }
 
     var hasControlModifier: Bool {
@@ -209,6 +192,19 @@ struct KeyPress {
     }
 }
 
+private func encodeFKey(_ n: UInt8) -> String {
+    let codes: [String] = [
+        "OP", "OQ", "OR", "OS",  // F1-F4
+        "[15~", "[17~", "[18~", "[19~",  // F5-F8
+        "[20~", "[21~", "[23~", "[24~"   // F9-F12
+    ]
+    let index = Int(n - 1)
+    if index < codes.count {
+        return "\u{1B}\(codes[index])"
+    }
+    return ""
+}
+
 // MARK: - 输入处理器
 
 class TerminalInputHandler {
@@ -217,12 +213,12 @@ class TerminalInputHandler {
     func handleKeyPress(_ keyPress: KeyPress) -> Bool {
         // 检查特殊快捷键
         if keyPress.isControlC {
-            session?.send([0x03])  // SIGINT
+            session?.write([0x03] as [UInt8])
             return true
         }
 
         if keyPress.isControlD {
-            session?.send([0x04])  // EOF
+            session?.write([0x04] as [UInt8])
             return true
         }
 
@@ -230,7 +226,7 @@ class TerminalInputHandler {
         if keyPress.hasControlModifier, let char = keyPress.characters?.first {
             let code = char.asciiValue ?? 0
             if code >= 0x61 && code <= 0x7A {  // a-z
-                session?.send([UInt8(code - 0x61 + 0x01)])
+                session?.write([UInt8(code - 0x61 + 0x01)] as [UInt8])
                 return true
             }
         }
@@ -244,13 +240,13 @@ class TerminalInputHandler {
             session?.write("\t")
 
         case .backspace:
-            session?.send([0x7F])
+            session?.write([0x7F] as [UInt8])
 
         case .delete:
             session?.write("\u{1B}[3~")
 
         case .escape:
-            session?.send([0x1B])
+            session?.write([0x1B] as [UInt8])
 
         case .upArrow:
             session?.write("\u{1B}[A")
