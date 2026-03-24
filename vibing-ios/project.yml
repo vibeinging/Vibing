@@ -1,0 +1,80 @@
+name: Vibing
+options:
+  bundleIdPrefix: com.vibing
+  deploymentTarget:
+    iOS: "15.0"
+  xcodeVersion: "15.0"
+  generateEmptyDirectories: false
+
+targets:
+  Vibing:
+    type: application
+    platform: iOS
+    sources:
+      - path: Resources
+      - path: Models
+      - path: Network
+        excludes:
+          - "TerminalSyncEngine.swift"
+          - "RelayClient.swift"
+          - "RelayCrypto.swift"
+      - path: Utilities
+        excludes:
+          - "ANSIParser.swift"
+      - path: Vibing
+        excludes:
+          - "Views/"
+          - "Shaders.metal"
+      - path: ViewControllers
+        excludes:
+          - "ConnectionViewController.swift"
+          - "ConnectionSettingsViewController.swift"
+          - "TerminalViewController.swift"
+      - path: Views
+        excludes:
+          - "TerminalMetalView.swift"
+          - "ConnectionStatusBannerView.swift"
+          - "KeyboardAccessoryView.swift"
+    info:
+      path: Vibing/Info.plist
+      properties:
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+          UISceneConfigurations:
+            UIWindowSceneSessionRoleApplication:
+              - UISceneConfigurationName: Default Configuration
+                UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+          NSExceptionDomains:
+            localhost:
+              NSExceptionAllowsInsecureHTTPLoads: true
+              NSIncludesSubdomains: true
+            "127.0.0.1":
+              NSExceptionAllowsInsecureHTTPLoads: true
+        UILaunchScreen: {}
+        CFBundleIconName: AppIcon
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        CFBundleURLTypes:
+          - CFBundleURLSchemes:
+              - vibing
+            CFBundleURLName: com.vibing.ios
+        NSCameraUsageDescription: "Vibing needs camera access to scan QR codes for login."
+        NSMicrophoneUsageDescription: "Vibing needs microphone access for voice input to send commands to your terminal."
+        NSSpeechRecognitionUsageDescription: "Vibing uses speech recognition to convert voice to terminal commands."
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.vibing.ios
+        DEVELOPMENT_TEAM: BB5VK42K87
+        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_FILE: Vibing/Info.plist
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_VERSION: "5.9"

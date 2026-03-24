@@ -1,0 +1,75 @@
+/* Login */
+"login.welcome" = "欢迎使用 Vibing";
+"login.subtitle" = "随时随地监控和操作你的终端。";
+"login.username" = "用户名";
+"login.password" = "密码";
+"login.signIn" = "登录";
+"login.createAccount" = "创建账号";
+"login.noAccount" = "没有账号？注册";
+"login.hasAccount" = "已有账号？登录";
+"login.or" = "— 或 —";
+"login.qrScan" = "扫码登录";
+"login.qrTitle" = "扫码登录";
+"login.qrMessage" = "输入已登录设备上显示的二维码内容";
+"login.serverPlaceholder" = "服务器地址";
+"login.fillFields" = "请填写所有字段";
+"login.qrScanCamera" = "使用相机扫码";
+"login.qrManualInput" = "手动输入码";
+"login.cancel" = "取消";
+"login.login" = "登录";
+
+/* Devices */
+"devices.title" = "设备";
+"devices.yourDevices" = "我的设备";
+"devices.online" = "在线";
+"devices.offline" = "离线";
+"devices.noDevices" = "暂无设备";
+"devices.noDevicesHint" = "在 Mac 上启动 Vibing 即可在此显示。\n点击 + 手动连接。";
+"devices.connect" = "连接设备";
+"devices.connectMessage" = "输入主机的中继地址和会话码";
+"devices.relayURL" = "中继地址";
+"devices.sessionCode" = "会话码（16位）";
+"devices.connectButton" = "连接";
+
+/* Sessions */
+"sessions.title" = "会话";
+"sessions.connecting" = "连接中...";
+"sessions.connected" = "已连接";
+"sessions.disconnected" = "已断开";
+"sessions.connectedCount" = "已连接 — %d 个会话";
+"sessions.terminalSessions" = "终端会话";
+"sessions.sessionNumber" = "会话 %d";
+
+/* Session Detail */
+"session.typeCommand" = "$ 输入命令...";
+
+/* Settings */
+"settings.title" = "设置";
+"settings.account" = "账号";
+"settings.username" = "用户名";
+"settings.generateQR" = "生成登录二维码";
+"settings.signOut" = "退出登录";
+"settings.signOutConfirm" = "确定要退出当前账号吗？";
+"settings.signOutTitle" = "退出登录";
+"settings.connection" = "连接设置";
+"settings.terminal" = "终端设置";
+"settings.cursor" = "光标设置";
+"settings.advanced" = "高级设置";
+"settings.reset" = "重置";
+"settings.language" = "语言";
+"settings.languageTitle" = "选择语言";
+"settings.followSystem" = "跟随系统";
+"settings.restoreDefaults" = "恢复默认设置";
+"settings.restoreConfirm" = "确定要将所有设置恢复为默认值吗？";
+"settings.restored" = "已恢复默认设置";
+"settings.accountFooter" = "如需更换服务器地址，请退出登录后重新登录。";
+"settings.serverURL" = "服务器";
+"settings.ok" = "好";
+"settings.cancel" = "取消";
+"settings.restore" = "恢复";
+
+/* Common */
+"common.cancel" = "取消";
+"common.done" = "完成";
+"common.error" = "错误";
+"common.ok" = "好";

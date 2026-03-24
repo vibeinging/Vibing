@@ -1,0 +1,75 @@
+/* Login */
+"login.welcome" = "Welcome to Vibing";
+"login.subtitle" = "Monitor and control your terminals\nfrom anywhere.";
+"login.username" = "Username";
+"login.password" = "Password";
+"login.signIn" = "Sign In";
+"login.createAccount" = "Create Account";
+"login.noAccount" = "Don't have an account? Register";
+"login.hasAccount" = "Already have an account? Sign In";
+"login.or" = "— or —";
+"login.qrScan" = "Scan QR Code to Login";
+"login.qrTitle" = "QR Code Login";
+"login.qrMessage" = "Enter the code from a logged-in device";
+"login.serverPlaceholder" = "Server address";
+"login.fillFields" = "Please fill in all fields";
+"login.qrScanCamera" = "Scan with Camera";
+"login.qrManualInput" = "Enter Code Manually";
+"login.cancel" = "Cancel";
+"login.login" = "Login";
+
+/* Devices */
+"devices.title" = "Devices";
+"devices.yourDevices" = "YOUR DEVICES";
+"devices.online" = "Online";
+"devices.offline" = "Offline";
+"devices.noDevices" = "No Devices";
+"devices.noDevicesHint" = "Start Vibing on your Mac to see it here.\nTap + to connect manually.";
+"devices.connect" = "Connect to Device";
+"devices.connectMessage" = "Enter the relay URL and session code from the host";
+"devices.relayURL" = "Relay URL";
+"devices.sessionCode" = "Session code (16 characters)";
+"devices.connectButton" = "Connect";
+
+/* Sessions */
+"sessions.title" = "Sessions";
+"sessions.connecting" = "Connecting...";
+"sessions.connected" = "Connected";
+"sessions.disconnected" = "Disconnected";
+"sessions.connectedCount" = "Connected — %d session(s)";
+"sessions.terminalSessions" = "Terminal Sessions";
+"sessions.sessionNumber" = "Session %d";
+
+/* Session Detail */
+"session.typeCommand" = "$ type command...";
+
+/* Settings */
+"settings.title" = "Settings";
+"settings.account" = "Account";
+"settings.username" = "Username";
+"settings.generateQR" = "Generate Login QR Code";
+"settings.signOut" = "Sign Out";
+"settings.signOutConfirm" = "Are you sure you want to sign out?";
+"settings.signOutTitle" = "Sign Out";
+"settings.connection" = "Connection";
+"settings.terminal" = "Terminal";
+"settings.cursor" = "Cursor";
+"settings.advanced" = "Advanced";
+"settings.reset" = "Reset";
+"settings.language" = "Language";
+"settings.languageTitle" = "Language";
+"settings.followSystem" = "Follow System";
+"settings.restoreDefaults" = "Restore Defaults";
+"settings.restoreConfirm" = "Restore all settings to defaults?";
+"settings.restored" = "Settings restored";
+"settings.accountFooter" = "To change the server URL, sign out and log in again.";
+"settings.serverURL" = "Server";
+"settings.ok" = "OK";
+"settings.cancel" = "Cancel";
+"settings.restore" = "Restore";
+
+/* Common */
+"common.cancel" = "Cancel";
+"common.done" = "Done";
+"common.error" = "Error";
+"common.ok" = "OK";
