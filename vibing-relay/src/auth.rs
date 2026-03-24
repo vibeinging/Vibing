@@ -34,6 +34,7 @@ pub struct RegisterRequest {
     pub password: String,
     pub device_name: Option<String>,
     pub device_type: Option<String>,
+    pub invite_code: Option<String>,
 }
 
 /// 登录请求
@@ -143,6 +144,15 @@ pub fn register(
         return Err("Username can only contain letters, numbers, _ and -".to_string());
     }
 
+    // 验证邀请码
+    let invite_code = req.invite_code.as_deref().unwrap_or("");
+    if invite_code.is_empty() {
+        return Err("Invite code is required".to_string());
+    }
+    if !db.validate_invite_code(invite_code).unwrap_or(false) {
+        return Err("Invalid or expired invite code".to_string());
+    }
+
     // 检查用户名是否已存在
     if let Ok(Some(_)) = db.get_user_by_username(&req.username) {
         return Err("Username already taken".to_string());
@@ -155,6 +165,9 @@ pub fn register(
 
     db.create_user(&user_id, &req.username, &password_hash)
         .map_err(|e| format!("Failed to create user: {}", e))?;
+
+    // 消费邀请码
+    let _ = db.use_invite_code(invite_code, &user_id);
 
     // 注册设备
     let device_id = if let (Some(name), Some(dtype)) = (&req.device_name, &req.device_type) {

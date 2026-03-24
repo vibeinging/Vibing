@@ -19,6 +19,22 @@ pub struct User {
     pub password_hash: String,
     pub created_at: String,
     pub last_login: Option<String>,
+    #[serde(default = "default_status")]
+    pub status: String,
+}
+
+fn default_status() -> String { "active".to_string() }
+
+/// 邀请码
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InviteCode {
+    pub code: String,
+    pub created_by: Option<String>,
+    pub created_at: String,
+    pub used_by: Option<String>,
+    pub used_at: Option<String>,
+    pub max_uses: i32,
+    pub use_count: i32,
 }
 
 /// 设备
@@ -57,7 +73,8 @@ impl Database {
                 username TEXT UNIQUE NOT NULL,
                 password_hash TEXT NOT NULL,
                 created_at TEXT NOT NULL,
-                last_login TEXT
+                last_login TEXT,
+                status TEXT DEFAULT 'active'
             );
 
             CREATE TABLE IF NOT EXISTS devices (
@@ -70,8 +87,22 @@ impl Database {
                 last_seen TEXT NOT NULL
             );
 
-            CREATE INDEX IF NOT EXISTS idx_devices_user_id ON devices(user_id);",
+            CREATE INDEX IF NOT EXISTS idx_devices_user_id ON devices(user_id);
+
+            CREATE TABLE IF NOT EXISTS invite_codes (
+                code TEXT PRIMARY KEY,
+                created_by TEXT,
+                created_at TEXT NOT NULL,
+                used_by TEXT,
+                used_at TEXT,
+                max_uses INTEGER DEFAULT 1,
+                use_count INTEGER DEFAULT 0
+            );",
         )?;
+
+        // 迁移：给已有 users 表加 status 字段（如果不存在）
+        let _ = conn.execute("ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'active'", []);
+
         Ok(())
     }
 
@@ -81,7 +112,7 @@ impl Database {
         let conn = self.conn.lock().unwrap();
         let now = Utc::now().to_rfc3339();
         conn.execute(
-            "INSERT INTO users (id, username, password_hash, created_at) VALUES (?1, ?2, ?3, ?4)",
+            "INSERT INTO users (id, username, password_hash, created_at, status) VALUES (?1, ?2, ?3, ?4, 'active')",
             params![id, username, password_hash, now],
         )?;
         Ok(User {
@@ -90,13 +121,14 @@ impl Database {
             password_hash: password_hash.to_string(),
             created_at: now,
             last_login: None,
+            status: "active".to_string(),
         })
     }
 
     fn get_user_by(&self, column: &str, value: &str) -> anyhow::Result<Option<User>> {
         let conn = self.conn.lock().unwrap();
         let sql = format!(
-            "SELECT id, username, password_hash, created_at, last_login FROM users WHERE {} = ?1",
+            "SELECT id, username, password_hash, created_at, last_login, COALESCE(status, 'active') FROM users WHERE {} = ?1",
             column
         );
         let mut stmt = conn.prepare(&sql)?;
@@ -108,6 +140,7 @@ impl Database {
                 password_hash: row.get(2)?,
                 created_at: row.get(3)?,
                 last_login: row.get(4)?,
+                status: row.get(5)?,
             }))
         } else {
             Ok(None)
@@ -201,5 +234,123 @@ impl Database {
             params![now, device_id],
         )?;
         Ok(())
+    }
+
+    // ---- Admin: Users ----
+
+    pub fn list_all_users(&self) -> anyhow::Result<Vec<User>> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn.prepare(
+            "SELECT id, username, password_hash, created_at, last_login, COALESCE(status, 'active') FROM users ORDER BY created_at DESC"
+        )?;
+        let users = stmt.query_map([], |row| {
+            Ok(User {
+                id: row.get(0)?,
+                username: row.get(1)?,
+                password_hash: row.get(2)?,
+                created_at: row.get(3)?,
+                last_login: row.get(4)?,
+                status: row.get(5)?,
+            })
+        })?.collect::<Result<Vec<_>, _>>()?;
+        Ok(users)
+    }
+
+    pub fn set_user_status(&self, user_id: &str, status: &str) -> anyhow::Result<bool> {
+        let conn = self.conn.lock().unwrap();
+        let rows = conn.execute(
+            "UPDATE users SET status = ?1 WHERE id = ?2",
+            params![status, user_id],
+        )?;
+        Ok(rows > 0)
+    }
+
+    pub fn delete_user(&self, user_id: &str) -> anyhow::Result<bool> {
+        let conn = self.conn.lock().unwrap();
+        // 删用户会级联删设备
+        let rows = conn.execute("DELETE FROM users WHERE id = ?1", params![user_id])?;
+        Ok(rows > 0)
+    }
+
+    pub fn user_count(&self) -> anyhow::Result<i64> {
+        let conn = self.conn.lock().unwrap();
+        let count: i64 = conn.query_row("SELECT COUNT(*) FROM users", [], |row| row.get(0))?;
+        Ok(count)
+    }
+
+    // ---- Invite Codes ----
+
+    pub fn create_invite_code(&self, code: &str, created_by: &str, max_uses: i32) -> anyhow::Result<InviteCode> {
+        let conn = self.conn.lock().unwrap();
+        let now = Utc::now().to_rfc3339();
+        conn.execute(
+            "INSERT INTO invite_codes (code, created_by, created_at, max_uses, use_count) VALUES (?1, ?2, ?3, ?4, 0)",
+            params![code, created_by, now, max_uses],
+        )?;
+        Ok(InviteCode {
+            code: code.to_string(),
+            created_by: Some(created_by.to_string()),
+            created_at: now,
+            used_by: None,
+            used_at: None,
+            max_uses,
+            use_count: 0,
+        })
+    }
+
+    pub fn validate_invite_code(&self, code: &str) -> anyhow::Result<bool> {
+        let conn = self.conn.lock().unwrap();
+        let result: Option<(i32, i32)> = conn.query_row(
+            "SELECT max_uses, use_count FROM invite_codes WHERE code = ?1",
+            params![code],
+            |row| Ok((row.get(0)?, row.get(1)?)),
+        ).ok();
+        match result {
+            Some((max_uses, use_count)) => Ok(use_count < max_uses),
+            None => Ok(false),
+        }
+    }
+
+    pub fn use_invite_code(&self, code: &str, user_id: &str) -> anyhow::Result<bool> {
+        let conn = self.conn.lock().unwrap();
+        let now = Utc::now().to_rfc3339();
+        let rows = conn.execute(
+            "UPDATE invite_codes SET use_count = use_count + 1, used_by = ?1, used_at = ?2 WHERE code = ?3 AND use_count < max_uses",
+            params![user_id, now, code],
+        )?;
+        Ok(rows > 0)
+    }
+
+    pub fn list_invite_codes(&self) -> anyhow::Result<Vec<InviteCode>> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn.prepare(
+            "SELECT code, created_by, created_at, used_by, used_at, max_uses, use_count FROM invite_codes ORDER BY created_at DESC"
+        )?;
+        let codes = stmt.query_map([], |row| {
+            Ok(InviteCode {
+                code: row.get(0)?,
+                created_by: row.get(1)?,
+                created_at: row.get(2)?,
+                used_by: row.get(3)?,
+                used_at: row.get(4)?,
+                max_uses: row.get(5)?,
+                use_count: row.get(6)?,
+            })
+        })?.collect::<Result<Vec<_>, _>>()?;
+        Ok(codes)
+    }
+
+    pub fn delete_invite_code(&self, code: &str) -> anyhow::Result<bool> {
+        let conn = self.conn.lock().unwrap();
+        let rows = conn.execute("DELETE FROM invite_codes WHERE code = ?1", params![code])?;
+        Ok(rows > 0)
+    }
+
+    pub fn invite_code_count(&self) -> anyhow::Result<i64> {
+        let conn = self.conn.lock().unwrap();
+        let count: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM invite_codes WHERE use_count < max_uses", [], |row| row.get(0)
+        )?;
+        Ok(count)
     }
 }

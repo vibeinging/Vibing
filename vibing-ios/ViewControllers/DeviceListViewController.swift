@@ -188,7 +188,7 @@ class DeviceListViewController: UIViewController {
 
                 await MainActor.run {
                     if let session = matching.first {
-                        let relayURL = (UserDefaults.standard.string(forKey: "relayServerURL") ?? "http://127.0.0.1:8766")
+                        let relayURL = (UserDefaults.standard.string(forKey: "relayServerURL") ?? "")
                             .replacingOccurrences(of: "http://", with: "ws://")
                             .replacingOccurrences(of: "https://", with: "wss://")
                         self.connectToDevice(relayURL: relayURL, sessionCode: session.session_id)

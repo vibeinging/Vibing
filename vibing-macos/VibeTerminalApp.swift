@@ -29,9 +29,11 @@ struct VibeTerminalApp: App {
         }
         .windowStyle(.hiddenTitleBar)
         .commands {
+            let zh = AppLanguage.current == .chinese
+
             // MARK: App Menu
             CommandGroup(replacing: .appSettings) {
-                Button("Settings...") {
+                Button(zh ? "设置..." : "Settings...") {
                     NotificationCenter.default.post(name: .init("OpenSettings"), object: nil)
                 }
                 .keyboardShortcut(",", modifiers: [.command])
@@ -39,19 +41,19 @@ struct VibeTerminalApp: App {
 
             // MARK: File Menu
             CommandGroup(replacing: .newItem) {
-                Button("New Tab") {
+                Button(zh ? "新建标签页" : "New Tab") {
                     postMenuAction("NewTab")
                 }
                 .keyboardShortcut("t", modifiers: [.command])
 
-                Button("New Window") {
+                Button(zh ? "新建窗口" : "New Window") {
                     AppDelegate.shared.newWindow()
                 }
                 .keyboardShortcut("n", modifiers: [.command])
 
                 Divider()
 
-                Button("Close Pane") {
+                Button(zh ? "关闭窗格" : "Close Pane") {
                     postMenuAction("ClosePane")
                 }
                 .keyboardShortcut("w", modifiers: [.command])
@@ -61,7 +63,7 @@ struct VibeTerminalApp: App {
             CommandGroup(after: .pasteboard) {
                 Divider()
 
-                Button("Find...") {
+                Button(zh ? "查找..." : "Find...") {
                     postMenuAction("Find")
                 }
                 .keyboardShortcut("f", modifiers: [.command])
@@ -69,64 +71,64 @@ struct VibeTerminalApp: App {
 
             // MARK: View Menu
             CommandGroup(replacing: .sidebar) {
-                Button("Command Palette") {
+                Button(zh ? "命令面板" : "Command Palette") {
                     postMenuAction("CommandPalette")
                 }
                 .keyboardShortcut("k", modifiers: [.command])
 
                 Divider()
 
-                Button("Split Horizontal") {
+                Button(zh ? "水平分屏" : "Split Horizontal") {
                     postMenuAction("SplitHorizontal")
                 }
                 .keyboardShortcut("d", modifiers: [.command])
 
-                Button("Split Vertical") {
+                Button(zh ? "垂直分屏" : "Split Vertical") {
                     postMenuAction("SplitVertical")
                 }
                 .keyboardShortcut("d", modifiers: [.command, .shift])
 
                 Divider()
 
-                Button("Next Pane") {
+                Button(zh ? "下一个窗格" : "Next Pane") {
                     postMenuAction("NextPane")
                 }
                 .keyboardShortcut("]", modifiers: [.command])
 
-                Button("Previous Pane") {
+                Button(zh ? "上一个窗格" : "Previous Pane") {
                     postMenuAction("PreviousPane")
                 }
                 .keyboardShortcut("[", modifiers: [.command])
 
-                Button("Maximize Pane") {
+                Button(zh ? "最大化窗格" : "Maximize Pane") {
                     postMenuAction("MaximizePane")
                 }
                 .keyboardShortcut(.return, modifiers: [.command, .shift])
 
                 Divider()
 
-                Button("Zoom In") {
+                Button(zh ? "放大" : "Zoom In") {
                     postMenuAction("ZoomIn")
                 }
                 .keyboardShortcut("=", modifiers: [.command])
 
-                Button("Zoom Out") {
+                Button(zh ? "缩小" : "Zoom Out") {
                     postMenuAction("ZoomOut")
                 }
                 .keyboardShortcut("-", modifiers: [.command])
 
-                Button("Reset Zoom") {
+                Button(zh ? "重置缩放" : "Reset Zoom") {
                     postMenuAction("ZoomReset")
                 }
                 .keyboardShortcut("0", modifiers: [.command])
 
                 Divider()
 
-                Button("Next Theme") {
+                Button(zh ? "切换主题" : "Next Theme") {
                     postMenuAction("NextTheme")
                 }
 
-                Button("Save Layout...") {
+                Button(zh ? "保存布局..." : "Save Layout...") {
                     postMenuAction("SaveLaunchConfig")
                 }
             }
@@ -281,11 +283,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: path)
 
-        // 配置环境
-        process.arguments = [
+        // 基础参数
+        var args = [
             "--bind", "127.0.0.1:8765",
             "--log", "info"
         ]
+
+        // Hook API: 仅当用户在设置中显式开启时启用
+        let hookApiEnabled = UserDefaults.standard.bool(forKey: "hookApiEnabled")
+        if hookApiEnabled {
+            args.append("--hook-api")
+            args.append("--hook-api-bind")
+            args.append("127.0.0.1:8767")
+
+            // 从 Keychain 读取或生成 token
+            let token = Self.getOrCreateHookApiToken()
+            args.append("--hook-api-token")
+            args.append(token)
+        }
+
+        process.arguments = args
 
         // 设置工作目录
         process.currentDirectoryURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
@@ -310,5 +327,75 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func stopBackend() {
         backendProcess?.terminate()
         backendProcess = nil
+    }
+
+    /// 重启后端（Hook API 设置变更时调用）
+    func restartBackend() {
+        stopBackend()
+        // 短暂延迟确保端口释放
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.startBackend()
+        }
+    }
+
+    // MARK: - Hook API Token (Keychain)
+
+    private static let keychainService = "com.vibing.hook-api"
+    private static let keychainAccount = "hook-api-token"
+
+    /// 从 Keychain 获取 token，不存在则生成并存储
+    static func getOrCreateHookApiToken() -> String {
+        if let existing = readTokenFromKeychain() {
+            return existing
+        }
+        let token = "vb_" + randomAlphanumeric(count: 48)
+        saveTokenToKeychain(token)
+        return token
+    }
+
+    /// 重新生成 token（用户点击"重新生成"按钮时）
+    static func regenerateHookApiToken() -> String {
+        let token = "vb_" + randomAlphanumeric(count: 48)
+        saveTokenToKeychain(token)
+        return token
+    }
+
+    private static func randomAlphanumeric(count: Int) -> String {
+        let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return String((0..<count).map { _ in chars.randomElement()! })
+    }
+
+    private static func readTokenFromKeychain() -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: keychainAccount,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne,
+        ]
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        guard status == errSecSuccess, let data = result as? Data else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    private static func saveTokenToKeychain(_ token: String) {
+        // 先删除旧的
+        let deleteQuery: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: keychainAccount,
+        ]
+        SecItemDelete(deleteQuery as CFDictionary)
+
+        // 存入新的
+        let addQuery: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: keychainAccount,
+            kSecValueData as String: token.data(using: .utf8)!,
+            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+        ]
+        SecItemAdd(addQuery as CFDictionary, nil)
     }
 }

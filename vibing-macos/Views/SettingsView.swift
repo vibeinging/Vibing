@@ -40,6 +40,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable {
     case terminal = "Terminal"
     case keybindings = "Keybindings"
     case sessions = "Sessions"
+    case features = "Features"
     case advanced = "Advanced"
     case about = "About"
 
@@ -52,6 +53,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable {
         case .terminal: return "terminal.fill"
         case .keybindings: return "keyboard"
         case .sessions: return "rectangle.stack.fill"
+        case .features: return "sparkles"
         case .advanced: return "gearshape.2.fill"
         case .about: return "info.circle.fill"
         }
@@ -65,6 +67,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable {
         case .terminal: return zh ? "终端" : "Terminal"
         case .keybindings: return zh ? "快捷键" : "Keybindings"
         case .sessions: return zh ? "会话" : "Sessions"
+        case .features: return zh ? "功能" : "Features"
         case .advanced: return zh ? "高级" : "Advanced"
         case .about: return zh ? "关于" : "About"
         }
@@ -78,6 +81,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable {
         case .terminal: return zh ? "Shell、光标、回滚" : "Shell, cursor, scrollback"
         case .keybindings: return zh ? "键盘快捷方式" : "Keyboard shortcuts"
         case .sessions: return zh ? "启动配置" : "Launch configurations"
+        case .features: return zh ? "Hook API、自动化、安全" : "Hook API, automation, security"
         case .advanced: return zh ? "性能、诊断" : "Performance, diagnostics"
         case .about: return zh ? "版本、许可" : "Version, licenses"
         }
@@ -122,7 +126,7 @@ struct SettingsView: View {
                 .stroke(SwiftUI.Color.white.opacity(0.1), lineWidth: 0.5)
         )
         .shadow(color: .black.opacity(0.5), radius: 40, x: 0, y: 20)
-        .frame(width: 780, height: 540)
+        .frame(width: 860, height: 620)
     }
 
     // MARK: - Sidebar
@@ -259,6 +263,8 @@ struct SettingsView: View {
                         borderColor: borderColor,
                         accentBlue: accentBlue
                     )
+                case .features:
+                    FeaturesSettings(cardBg: cardBg, borderColor: borderColor)
                 case .advanced:
                     AdvancedSettings(cardBg: cardBg, borderColor: borderColor)
                 case .about:
@@ -360,16 +366,17 @@ struct AppearanceSettings: View {
     @AppStorage("focusFollowsMouse") private var focusFollowsMouse = false
 
     private let fonts = ["Menlo", "SF Mono", "Monaco", "Fira Code", "JetBrains Mono", "Cascadia Code"]
+    private var zh: Bool { AppLanguage.current == .chinese }
 
     var body: some View {
         // Theme
-        SettingsCard(title: "Theme", cardBg: cardBg, borderColor: borderColor) {
+        SettingsCard(title: zh ? "主题" : "Theme", cardBg: cardBg, borderColor: borderColor) {
             themeGrid
         }
 
         // Font
-        SettingsCard(title: "Font", cardBg: cardBg, borderColor: borderColor) {
-            SettingsRow(label: "Font Family", description: "Monospace font for terminal") {
+        SettingsCard(title: zh ? "字体" : "Font", cardBg: cardBg, borderColor: borderColor) {
+            SettingsRow(label: zh ? "字体" : "Font Family", description: zh ? "终端等宽字体" : "Monospace font for terminal") {
                 Picker("", selection: $selectedFont) {
                     ForEach(fonts, id: \.self) { font in
                         Text(font).tag(font)
@@ -379,7 +386,7 @@ struct AppearanceSettings: View {
                 .frame(width: 160)
             }
 
-            SettingsRow(label: "Font Size", description: "\(Int(fontSize))pt", showDivider: false) {
+            SettingsRow(label: zh ? "字号" : "Font Size", description: "\(Int(fontSize))pt", showDivider: false) {
                 HStack(spacing: 8) {
                     Button(action: { if fontSize > 8 { fontSize -= 1 } }) {
                         Image(systemName: "minus")
@@ -409,7 +416,7 @@ struct AppearanceSettings: View {
         }
 
         // Preview
-        SettingsCard(title: "Preview", cardBg: cardBg, borderColor: borderColor) {
+        SettingsCard(title: zh ? "预览" : "Preview", cardBg: cardBg, borderColor: borderColor) {
             VStack(alignment: .leading, spacing: 0) {
                 Text("$ echo \"Hello, Vibing\"")
                     .font(.system(size: CGFloat(fontSize), design: .monospaced))
@@ -427,15 +434,15 @@ struct AppearanceSettings: View {
         }
 
         // Panes
-        SettingsCard(title: "Panes", cardBg: cardBg, borderColor: borderColor) {
-            SettingsRow(label: "Dim Inactive Panes", description: "Darken non-focused panes in split view") {
+        SettingsCard(title: zh ? "面板" : "Panes", cardBg: cardBg, borderColor: borderColor) {
+            SettingsRow(label: zh ? "暗化非活动面板" : "Dim Inactive Panes", description: zh ? "分屏时暗化非聚焦面板" : "Darken non-focused panes in split view") {
                 Toggle("", isOn: $dimInactivePanes)
                     .labelsHidden()
                     .toggleStyle(.switch)
                     .tint(accentBlue)
             }
 
-            SettingsRow(label: "Focus Follows Mouse", description: "Activate pane on mouse hover", showDivider: false) {
+            SettingsRow(label: zh ? "鼠标跟随聚焦" : "Focus Follows Mouse", description: zh ? "鼠标悬停激活面板" : "Activate pane on mouse hover", showDivider: false) {
                 Toggle("", isOn: $focusFollowsMouse)
                     .labelsHidden()
                     .toggleStyle(.switch)
@@ -444,8 +451,8 @@ struct AppearanceSettings: View {
         }
 
         // Window
-        SettingsCard(title: "Window", cardBg: cardBg, borderColor: borderColor) {
-            SettingsRow(label: "Background Opacity", description: "\(Int(themeManager.currentTheme.backgroundOpacity * 100))%", showDivider: false) {
+        SettingsCard(title: zh ? "窗口" : "Window", cardBg: cardBg, borderColor: borderColor) {
+            SettingsRow(label: zh ? "背景透明度" : "Background Opacity", description: "\(Int(themeManager.currentTheme.backgroundOpacity * 100))%", showDivider: false) {
                 Slider(value: .constant(themeManager.currentTheme.backgroundOpacity), in: 0.5...1.0, step: 0.05)
                     .frame(width: 140)
                     .tint(accentBlue)
@@ -533,17 +540,18 @@ struct TerminalSettings: View {
     @AppStorage("terminalRows") private var rows: Double = 36
 
     private let accentBlue = SwiftUI.Color(red: 82/255, green: 139/255, blue: 255/255)
+    private var zh: Bool { AppLanguage.current == .chinese }
 
     var body: some View {
         SettingsCard(title: "Shell", cardBg: cardBg, borderColor: borderColor) {
-            SettingsRow(label: "Default Shell") {
+            SettingsRow(label: zh ? "默认 Shell" : "Default Shell") {
                 Picker("", selection: $shellDetector.selectedShellPath) {
                     ForEach(shellDetector.availableShells) { shell in
                         HStack(spacing: 6) {
                             Text(shell.name)
                                 .font(.system(size: 13))
                             if shell.isDefault {
-                                Text("system")
+                                Text(zh ? "系统" : "system")
                                     .font(.system(size: 9))
                                     .foregroundColor(.white.opacity(0.4))
                                     .padding(.horizontal, 4)
@@ -561,18 +569,18 @@ struct TerminalSettings: View {
 
             // 当前选中 shell 的详情
             if let selected = shellDetector.availableShells.first(where: { $0.path == shellDetector.selectedShellPath }) {
-                SettingsRow(label: "Path", description: selected.path) {
+                SettingsRow(label: zh ? "路径" : "Path", description: selected.path) {
                     EmptyView()
                 }
 
                 if !selected.version.isEmpty {
-                    SettingsRow(label: "Version", description: selected.version) {
+                    SettingsRow(label: zh ? "版本" : "Version", description: selected.version) {
                         EmptyView()
                     }
                 }
             }
 
-            SettingsRow(label: "Working Directory", showDivider: false) {
+            SettingsRow(label: zh ? "工作目录" : "Working Directory", showDivider: false) {
                 Text("~")
                     .font(.system(size: 13, design: .monospaced))
                     .foregroundColor(.white.opacity(0.5))
@@ -580,7 +588,7 @@ struct TerminalSettings: View {
         }
 
         // 检测到的所有 Shell 列表
-        SettingsCard(title: "Available Shells (\(shellDetector.availableShells.count))", cardBg: cardBg, borderColor: borderColor) {
+        SettingsCard(title: zh ? "可用 Shell (\(shellDetector.availableShells.count))" : "Available Shells (\(shellDetector.availableShells.count))", cardBg: cardBg, borderColor: borderColor) {
             ForEach(Array(shellDetector.availableShells.enumerated()), id: \.element.id) { index, shell in
                 let isLast = index == shellDetector.availableShells.count - 1
                 SettingsRow(
@@ -590,7 +598,7 @@ struct TerminalSettings: View {
                 ) {
                     HStack(spacing: 8) {
                         if shell.isDefault {
-                            Text("Default")
+                            Text(zh ? "默认" : "Default")
                                 .font(.system(size: 10))
                                 .foregroundColor(accentBlue)
                                 .padding(.horizontal, 6)
@@ -603,7 +611,7 @@ struct TerminalSettings: View {
                                 .font(.system(size: 13))
                                 .foregroundColor(accentBlue)
                         } else {
-                            Button("Use") {
+                            Button(zh ? "使用" : "Use") {
                                 shellDetector.selectedShellPath = shell.path
                             }
                             .buttonStyle(.bordered)
@@ -617,7 +625,7 @@ struct TerminalSettings: View {
                 HStack {
                     ProgressView()
                         .scaleEffect(0.7)
-                    Text("Detecting shells...")
+                    Text(zh ? "正在检测 Shell..." : "Detecting shells...")
                         .font(.system(size: 12))
                         .foregroundColor(.white.opacity(0.5))
                 }
@@ -626,19 +634,19 @@ struct TerminalSettings: View {
             }
         }
 
-        SettingsCard(title: "Cursor", cardBg: cardBg, borderColor: borderColor) {
-            SettingsRow(label: "Cursor Style") {
+        SettingsCard(title: zh ? "光标" : "Cursor", cardBg: cardBg, borderColor: borderColor) {
+            SettingsRow(label: zh ? "光标样式" : "Cursor Style") {
                 Picker("", selection: $cursorStyle) {
-                    Text("Block").tag("block")
-                    Text("Underline").tag("underline")
-                    Text("Bar").tag("bar")
+                    Text(zh ? "方块" : "Block").tag("block")
+                    Text(zh ? "下划线" : "Underline").tag("underline")
+                    Text(zh ? "竖线" : "Bar").tag("bar")
                 }
                 .labelsHidden()
                 .pickerStyle(.segmented)
                 .frame(width: 200)
             }
 
-            SettingsRow(label: "Blinking Cursor", showDivider: false) {
+            SettingsRow(label: zh ? "光标闪烁" : "Blinking Cursor", showDivider: false) {
                 Toggle("", isOn: $cursorBlink)
                     .labelsHidden()
                     .toggleStyle(.switch)
@@ -646,18 +654,18 @@ struct TerminalSettings: View {
             }
         }
 
-        SettingsCard(title: "Display", cardBg: cardBg, borderColor: borderColor) {
-            SettingsRow(label: "Default Columns", description: "\(Int(cols))") {
+        SettingsCard(title: zh ? "显示" : "Display", cardBg: cardBg, borderColor: borderColor) {
+            SettingsRow(label: zh ? "默认列数" : "Default Columns", description: "\(Int(cols))") {
                 Slider(value: $cols, in: 40...200, step: 1)
                     .frame(width: 140)
             }
 
-            SettingsRow(label: "Default Rows", description: "\(Int(rows))") {
+            SettingsRow(label: zh ? "默认行数" : "Default Rows", description: "\(Int(rows))") {
                 Slider(value: $rows, in: 10...80, step: 1)
                     .frame(width: 140)
             }
 
-            SettingsRow(label: "Scrollback Lines", description: scrollback == 0 ? "Disabled" : "\(Int(scrollback))", showDivider: false) {
+            SettingsRow(label: zh ? "回滚行数" : "Scrollback Lines", description: scrollback == 0 ? (zh ? "已禁用" : "Disabled") : "\(Int(scrollback))", showDivider: false) {
                 Slider(value: $scrollback, in: 0...50000, step: 1000)
                     .frame(width: 140)
             }
@@ -670,36 +678,37 @@ struct TerminalSettings: View {
 struct KeybindingsSettings: View {
     let cardBg: SwiftUI.Color
     let borderColor: SwiftUI.Color
+    private var zh: Bool { AppLanguage.current == .chinese }
 
     var body: some View {
-        SettingsCard(title: "General", cardBg: cardBg, borderColor: borderColor) {
-            keybindingRow("New Tab", shortcut: "Cmd + T")
-            keybindingRow("Close Tab", shortcut: "Cmd + W")
-            keybindingRow("Settings", shortcut: "Cmd + ,")
-            keybindingRow("Command Palette", shortcut: "Cmd + K")
-            keybindingRow("Find", shortcut: "Cmd + F", showDivider: false)
+        SettingsCard(title: zh ? "通用" : "General", cardBg: cardBg, borderColor: borderColor) {
+            keybindingRow(zh ? "新建标签页" : "New Tab", shortcut: "Cmd + T")
+            keybindingRow(zh ? "关闭标签页" : "Close Tab", shortcut: "Cmd + W")
+            keybindingRow(zh ? "设置" : "Settings", shortcut: "Cmd + ,")
+            keybindingRow(zh ? "命令面板" : "Command Palette", shortcut: "Cmd + K")
+            keybindingRow(zh ? "查找" : "Find", shortcut: "Cmd + F", showDivider: false)
         }
 
-        SettingsCard(title: "Split Panes", cardBg: cardBg, borderColor: borderColor) {
-            keybindingRow("Split Horizontal", shortcut: "Cmd + D")
-            keybindingRow("Split Vertical", shortcut: "Cmd + Shift + D")
-            keybindingRow("Next Pane", shortcut: "Cmd + ]")
-            keybindingRow("Previous Pane", shortcut: "Cmd + [")
-            keybindingRow("Maximize Pane", shortcut: "Shift + Cmd + Enter", showDivider: false)
+        SettingsCard(title: zh ? "分屏" : "Split Panes", cardBg: cardBg, borderColor: borderColor) {
+            keybindingRow(zh ? "水平分屏" : "Split Horizontal", shortcut: "Cmd + D")
+            keybindingRow(zh ? "垂直分屏" : "Split Vertical", shortcut: "Cmd + Shift + D")
+            keybindingRow(zh ? "下一面板" : "Next Pane", shortcut: "Cmd + ]")
+            keybindingRow(zh ? "上一面板" : "Previous Pane", shortcut: "Cmd + [")
+            keybindingRow(zh ? "最大化面板" : "Maximize Pane", shortcut: "Shift + Cmd + Enter", showDivider: false)
         }
 
-        SettingsCard(title: "Navigation", cardBg: cardBg, borderColor: borderColor) {
-            keybindingRow("Navigate Up", shortcut: "Alt + Cmd + Up")
-            keybindingRow("Navigate Down", shortcut: "Alt + Cmd + Down")
-            keybindingRow("Navigate Left", shortcut: "Alt + Cmd + Left")
-            keybindingRow("Navigate Right", shortcut: "Alt + Cmd + Right", showDivider: false)
+        SettingsCard(title: zh ? "导航" : "Navigation", cardBg: cardBg, borderColor: borderColor) {
+            keybindingRow(zh ? "向上导航" : "Navigate Up", shortcut: "Alt + Cmd + Up")
+            keybindingRow(zh ? "向下导航" : "Navigate Down", shortcut: "Alt + Cmd + Down")
+            keybindingRow(zh ? "向左导航" : "Navigate Left", shortcut: "Alt + Cmd + Left")
+            keybindingRow(zh ? "向右导航" : "Navigate Right", shortcut: "Alt + Cmd + Right", showDivider: false)
         }
 
-        SettingsCard(title: "Resize", cardBg: cardBg, borderColor: borderColor) {
-            keybindingRow("Resize Up", shortcut: "Ctrl + Cmd + Up")
-            keybindingRow("Resize Down", shortcut: "Ctrl + Cmd + Down")
-            keybindingRow("Resize Left", shortcut: "Ctrl + Cmd + Left")
-            keybindingRow("Resize Right", shortcut: "Ctrl + Cmd + Right", showDivider: false)
+        SettingsCard(title: zh ? "调整大小" : "Resize", cardBg: cardBg, borderColor: borderColor) {
+            keybindingRow(zh ? "向上调整" : "Resize Up", shortcut: "Ctrl + Cmd + Up")
+            keybindingRow(zh ? "向下调整" : "Resize Down", shortcut: "Ctrl + Cmd + Down")
+            keybindingRow(zh ? "向左调整" : "Resize Left", shortcut: "Ctrl + Cmd + Left")
+            keybindingRow(zh ? "向右调整" : "Resize Right", shortcut: "Ctrl + Cmd + Right", showDivider: false)
         }
     }
 
@@ -722,29 +731,25 @@ struct NetworkSettings: View {
     let cardBg: SwiftUI.Color
     let borderColor: SwiftUI.Color
 
-    @AppStorage("relayServerURL") private var relayURL = "http://127.0.0.1:8766"
+    @AppStorage("relayServerURL") private var relayURL = ""
+    private var zh: Bool { AppLanguage.current == .chinese }
 
     var body: some View {
-        SettingsCard(title: "Backend Server", cardBg: cardBg, borderColor: borderColor) {
-            SettingsRow(label: "Server Address") {
-                Text("127.0.0.1:8765")
-                    .font(.system(size: 13, design: .monospaced))
-                    .foregroundColor(.white.opacity(0.5))
-            }
+        SettingsCard(title: zh ? "后端服务器" : "Backend Server", cardBg: cardBg, borderColor: borderColor) {
 
-            SettingsRow(label: "Status") {
+            SettingsRow(label: zh ? "状态" : "Status") {
                 HStack(spacing: 6) {
                     Circle()
                         .fill(SwiftUI.Color.green)
                         .frame(width: 6, height: 6)
-                    Text("Running")
+                    Text(zh ? "运行中" : "Running")
                         .font(.system(size: 13))
                         .foregroundColor(.green)
                 }
             }
 
-            SettingsRow(label: "Restart Server", showDivider: false) {
-                Button("Restart") {
+            SettingsRow(label: zh ? "重启服务器" : "Restart Server", showDivider: false) {
+                Button(zh ? "重启" : "Restart") {
                     // TODO: restart backend
                 }
                 .buttonStyle(.bordered)
@@ -752,18 +757,271 @@ struct NetworkSettings: View {
             }
         }
 
-        SettingsCard(title: "Relay", cardBg: cardBg, borderColor: borderColor) {
-            SettingsRow(label: "Relay Server", description: "End-to-end encrypted relay") {
+        SettingsCard(title: zh ? "中继" : "Relay", cardBg: cardBg, borderColor: borderColor) {
+            SettingsRow(label: zh ? "中继服务器" : "Relay Server", description: zh ? "端到端加密中继" : "End-to-end encrypted relay") {
                 TextField("", text: $relayURL)
                     .textFieldStyle(.roundedBorder)
                     .frame(width: 200)
                     .font(.system(size: 12, design: .monospaced))
             }
 
-            SettingsRow(label: "Encryption", showDivider: false) {
+            SettingsRow(label: zh ? "加密方式" : "Encryption", showDivider: false) {
                 Text("AES-256-GCM")
                     .font(.system(size: 12, design: .monospaced))
                     .foregroundColor(.white.opacity(0.4))
+            }
+        }
+    }
+}
+
+// MARK: - Features Settings
+
+struct FeaturesSettings: View {
+    let cardBg: SwiftUI.Color
+    let borderColor: SwiftUI.Color
+
+    private let accentGreen = SwiftUI.Color(red: 106/255, green: 194/255, blue: 120/255)
+    private var zh: Bool { AppLanguage.current == .chinese }
+
+    // Hook API
+    @AppStorage("hookApiEnabled") private var hookApiEnabled = false
+    @State private var hookApiToken: String = ""
+    @State private var showToken = false
+    @State private var showRestartAlert = false
+    @State private var copied = false
+
+    // Automation
+    @AppStorage("featureAutoApprove") private var autoApprove = false
+    @AppStorage("featureCircuitBreaker") private var circuitBreaker = false
+    @AppStorage("featureSecretDetector") private var secretDetector = false
+    @AppStorage("featureSessionAudit") private var sessionAudit = false
+    @AppStorage("featureIdleNotify") private var idleNotify = false
+
+    // Auto-approve config
+    @AppStorage("autoApproveReadOnly") private var autoApproveReadOnly = true
+    @AppStorage("autoApproveBlockDangerous") private var autoApproveBlockDangerous = true
+
+    // Circuit breaker config
+    @AppStorage("circuitBreakerLoopCount") private var circuitBreakerLoopCount = 5
+
+    @ViewBuilder
+    private func desc(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 12))
+            .foregroundColor(.white.opacity(0.45))
+            .lineSpacing(3)
+            .padding(.horizontal, 4)
+            .padding(.bottom, 4)
+    }
+
+    var body: some View {
+        // MARK: Hook API
+        desc(zh
+            ? "Vibing 工作在 PTY 层 — 每一次按键、每一行输出都经过这里。Hook API 将这条数据流暴露为可编程的 HTTP 接口，让外部脚本、Webhook 以及下方的自动化功能成为可能。"
+            : "Vibing sits at the PTY layer — every keystroke and every output passes through it. The Hook API exposes this data stream as a programmable HTTP interface, enabling external scripts, webhooks, and the automation features below."
+        )
+
+        SettingsCard(title: "Hook API", cardBg: cardBg, borderColor: borderColor) {
+            SettingsRow(
+                label: zh ? "启用 Hook API" : "Enable Hook API",
+                description: zh ? "通过 HTTP 暴露 PTY 事件，供外部工具和下方功能使用" : "Expose PTY events via HTTP for external tools and the features below"
+            ) {
+                Toggle("", isOn: $hookApiEnabled)
+                    .labelsHidden().toggleStyle(.switch).tint(accentGreen)
+                    .onChange(of: hookApiEnabled) { _ in showRestartAlert = true }
+            }
+
+            if hookApiEnabled {
+                HStack(spacing: 6) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.orange).font(.system(size: 12))
+                    Text(zh
+                        ? "开启后将授予 PTY 读写权限（仅本机访问）。请妥善保管 Token。"
+                        : "Grants PTY read/write access via localhost. Keep your token secret.")
+                        .font(.system(size: 11))
+                        .foregroundColor(.orange.opacity(0.9))
+                }
+                .padding(.horizontal, 16).padding(.vertical, 8)
+
+                Divider().padding(.horizontal, 16)
+
+                SettingsRow(
+                    label: zh ? "认证 Token" : "Auth Token",
+                    description: zh ? "所有 API 请求必须携带此 Token" : "Required for all API requests"
+                ) {
+                    HStack(spacing: 8) {
+                        Text(showToken ? hookApiToken : "••••••••••••••••")
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(.white.opacity(showToken ? 0.7 : 0.3))
+                            .lineLimit(1).truncationMode(.middle)
+                            .frame(maxWidth: 200, alignment: .trailing)
+
+                        Button(showToken ? (zh ? "隐藏" : "Hide") : (zh ? "显示" : "Show")) {
+                            showToken.toggle()
+                        }
+                        .buttonStyle(.bordered).controlSize(.mini)
+
+                        Button(copied ? (zh ? "已复制" : "Copied") : (zh ? "复制" : "Copy")) {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(hookApiToken, forType: .string)
+                            copied = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copied = false }
+                        }
+                        .buttonStyle(.bordered).controlSize(.mini)
+                    }
+                }
+
+                SettingsRow(
+                    label: zh ? "重新生成 Token" : "Regenerate Token",
+                    description: zh ? "将使所有现有连接失效" : "Invalidates all existing connections",
+                    showDivider: false
+                ) {
+                    Button(zh ? "重新生成" : "Regenerate") {
+                        hookApiToken = AppDelegate.regenerateHookApiToken()
+                        showRestartAlert = true
+                    }
+                    .buttonStyle(.bordered).controlSize(.small).tint(.orange)
+                }
+
+                Divider().padding(.horizontal, 16)
+
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(zh ? "接口地址" : "Endpoint")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.white.opacity(0.5))
+                        Text("http://127.0.0.1:8767/api/v1/")
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 16).padding(.vertical, 8)
+            }
+        }
+        .alert(zh ? "需要重启" : "Restart Required", isPresented: $showRestartAlert) {
+            Button(zh ? "立即重启" : "Restart Now") { AppDelegate.shared?.restartBackend() }
+            Button(zh ? "稍后" : "Later", role: .cancel) {}
+        } message: {
+            Text(zh ? "更改需要重启服务端才能生效。" : "Changes require a server restart to take effect.")
+        }
+        .onAppear { hookApiToken = AppDelegate.getOrCreateHookApiToken() }
+
+        // MARK: Automation
+        desc(zh
+            ? "让 Vibing 处理 Vibe Coding 中的重复操作。自动批准安全操作，不用反复输入 'y'；捕获失控的 Agent，避免浪费 API 额度；任务完成时立即收到通知。"
+            : "Let Vibing handle the repetitive parts of Vibe Coding. Auto-approve safe operations so you don't have to type 'y' a hundred times, catch runaway agents before they waste your API credits, and get notified the moment a task finishes."
+        )
+
+        SettingsCard(title: zh ? "自动化" : "Automation", cardBg: cardBg, borderColor: borderColor) {
+            SettingsRow(
+                label: zh ? "智能自动批准" : "Smart Auto-Approve",
+                description: zh ? "自动批准安全操作（读取文件、列目录），拦截危险操作" : "Auto-approve safe prompts (file reads, directory listings). Block dangerous operations."
+            ) {
+                Toggle("", isOn: $autoApprove)
+                    .labelsHidden().toggleStyle(.switch).tint(accentGreen)
+                    .disabled(!hookApiEnabled)
+            }
+
+            if autoApprove && hookApiEnabled {
+                SettingsRow(
+                    label: zh ? "  允许只读操作" : "  Allow read-only operations",
+                    description: zh ? "读取文件、列出目录、搜索" : "File reads, directory listings, search"
+                ) {
+                    Toggle("", isOn: $autoApproveReadOnly)
+                        .labelsHidden().toggleStyle(.switch).tint(accentGreen)
+                }
+                SettingsRow(
+                    label: zh ? "  拦截危险操作" : "  Block dangerous operations",
+                    description: zh ? "delete、rm -rf、force push、drop table" : "delete, rm -rf, force push, drop table"
+                ) {
+                    Toggle("", isOn: $autoApproveBlockDangerous)
+                        .labelsHidden().toggleStyle(.switch).tint(accentGreen)
+                }
+            }
+
+            Divider().padding(.horizontal, 16)
+
+            SettingsRow(
+                label: zh ? "失控 Agent 断路器" : "Runaway Agent Circuit Breaker",
+                description: zh ? "检测到死循环时自动发送 Ctrl+C 终止 Agent" : "Auto-detect infinite loops and send Ctrl+C to stop the agent"
+            ) {
+                Toggle("", isOn: $circuitBreaker)
+                    .labelsHidden().toggleStyle(.switch).tint(accentGreen)
+                    .disabled(!hookApiEnabled)
+            }
+
+            if circuitBreaker && hookApiEnabled {
+                SettingsRow(
+                    label: zh ? "  循环检测阈值" : "  Loop detection threshold",
+                    description: zh ? "检测到 N 次重复模式后发送 Ctrl+C" : "Send Ctrl+C after N repeated patterns"
+                ) {
+                    Picker("", selection: $circuitBreakerLoopCount) {
+                        Text("3").tag(3)
+                        Text("5").tag(5)
+                        Text("10").tag(10)
+                    }
+                    .pickerStyle(.segmented).frame(width: 120)
+                }
+            }
+
+            Divider().padding(.horizontal, 16)
+
+            SettingsRow(
+                label: zh ? "空闲通知" : "Idle Notifications",
+                description: zh ? "Agent 进入空闲时发送通知（任务可能已完成）" : "Notify when an agent goes idle (task may be complete)",
+                showDivider: false
+            ) {
+                Toggle("", isOn: $idleNotify)
+                    .labelsHidden().toggleStyle(.switch).tint(accentGreen)
+                    .disabled(!hookApiEnabled)
+            }
+
+            if !hookApiEnabled {
+                HStack(spacing: 4) {
+                    Image(systemName: "info.circle").font(.system(size: 10))
+                    Text(zh ? "请先开启上方的 Hook API 以使用自动化功能" : "Enable Hook API above to use automation features")
+                        .font(.system(size: 11))
+                }
+                .foregroundColor(.white.opacity(0.3))
+                .padding(.horizontal, 16).padding(.vertical, 8)
+            }
+        }
+
+        // MARK: Security
+        desc(zh
+            ? "AI Agent 可能意外泄露密钥或产生异常输出。以下功能实时监控 PTY 数据流，在问题升级为事故之前及时捕获。"
+            : "AI agents can accidentally leak secrets or produce unexpected output. These features monitor the PTY stream in real-time to catch issues before they become incidents."
+        )
+
+        SettingsCard(title: zh ? "安全" : "Security", cardBg: cardBg, borderColor: borderColor) {
+            SettingsRow(
+                label: zh ? "密钥泄露检测" : "Secret Leak Detector",
+                description: zh ? "扫描终端输出中意外打印的 API Key、Token 和密码" : "Scan terminal output for accidentally printed API keys, tokens, and passwords"
+            ) {
+                Toggle("", isOn: $secretDetector)
+                    .labelsHidden().toggleStyle(.switch).tint(accentGreen)
+                    .disabled(!hookApiEnabled)
+            }
+
+            SettingsRow(
+                label: zh ? "会话审计追踪" : "Session Audit Trail",
+                description: zh ? "记录所有命令、输出和审批操作，带时间戳" : "Log all commands, outputs, and approvals with timestamps",
+                showDivider: false
+            ) {
+                Toggle("", isOn: $sessionAudit)
+                    .labelsHidden().toggleStyle(.switch).tint(accentGreen)
+                    .disabled(!hookApiEnabled)
+            }
+
+            if !hookApiEnabled {
+                HStack(spacing: 4) {
+                    Image(systemName: "info.circle").font(.system(size: 10))
+                    Text(zh ? "请先开启上方的 Hook API 以使用安全功能" : "Enable Hook API above to use security features")
+                        .font(.system(size: 11))
+                }
+                .foregroundColor(.white.opacity(0.3))
+                .padding(.horizontal, 16).padding(.vertical, 8)
             }
         }
     }
@@ -779,17 +1037,18 @@ struct AdvancedSettings: View {
     @AppStorage("enableBellSound") private var bellSound = false
     @AppStorage("gpuRendering") private var gpuRendering = true
     @AppStorage("fps60Mode") private var fps60 = true
+    private var zh: Bool { AppLanguage.current == .chinese }
 
     var body: some View {
-        SettingsCard(title: "Features", cardBg: cardBg, borderColor: borderColor) {
-            SettingsRow(label: "Shell Integration", description: "Enable shell integration features") {
+        SettingsCard(title: zh ? "功能" : "Features", cardBg: cardBg, borderColor: borderColor) {
+            SettingsRow(label: zh ? "Shell 集成" : "Shell Integration", description: zh ? "启用 Shell 集成功能" : "Enable shell integration features") {
                 Toggle("", isOn: $shellIntegration)
                     .labelsHidden()
                     .toggleStyle(.switch)
                     .tint(SwiftUI.Color(red: 222/255, green: 172/255, blue: 92/255))
             }
 
-            SettingsRow(label: "Bell Sound", description: "Play sound on terminal bell", showDivider: false) {
+            SettingsRow(label: zh ? "响铃" : "Bell Sound", description: zh ? "终端响铃时播放声音" : "Play sound on terminal bell", showDivider: false) {
                 Toggle("", isOn: $bellSound)
                     .labelsHidden()
                     .toggleStyle(.switch)
@@ -797,15 +1056,15 @@ struct AdvancedSettings: View {
             }
         }
 
-        SettingsCard(title: "Performance", cardBg: cardBg, borderColor: borderColor) {
-            SettingsRow(label: "GPU Rendering", description: "Use Metal for terminal rendering") {
+        SettingsCard(title: zh ? "性能" : "Performance", cardBg: cardBg, borderColor: borderColor) {
+            SettingsRow(label: zh ? "GPU 渲染" : "GPU Rendering", description: zh ? "使用 Metal 渲染终端" : "Use Metal for terminal rendering") {
                 Toggle("", isOn: $gpuRendering)
                     .labelsHidden()
                     .toggleStyle(.switch)
                     .tint(SwiftUI.Color(red: 222/255, green: 172/255, blue: 92/255))
             }
 
-            SettingsRow(label: "60 FPS Mode", description: "Higher refresh rate rendering", showDivider: false) {
+            SettingsRow(label: zh ? "60 帧模式" : "60 FPS Mode", description: zh ? "更高刷新率渲染" : "Higher refresh rate rendering", showDivider: false) {
                 Toggle("", isOn: $fps60)
                     .labelsHidden()
                     .toggleStyle(.switch)
@@ -813,25 +1072,25 @@ struct AdvancedSettings: View {
             }
         }
 
-        SettingsCard(title: "Diagnostics", cardBg: cardBg, borderColor: borderColor) {
-            SettingsRow(label: "View Logs") {
-                Button("Open") {
+        SettingsCard(title: zh ? "诊断" : "Diagnostics", cardBg: cardBg, borderColor: borderColor) {
+            SettingsRow(label: zh ? "查看日志" : "View Logs") {
+                Button(zh ? "打开" : "Open") {
                     // TODO: open logs
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
             }
 
-            SettingsRow(label: "Export Configuration") {
-                Button("Export") {
+            SettingsRow(label: zh ? "导出配置" : "Export Configuration") {
+                Button(zh ? "导出" : "Export") {
                     // TODO: export config
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
             }
 
-            SettingsRow(label: "Reset to Defaults", description: "Restore all settings to default values", showDivider: false) {
-                Button("Reset") {
+            SettingsRow(label: zh ? "恢复默认" : "Reset to Defaults", description: zh ? "将所有设置恢复为默认值" : "Restore all settings to default values", showDivider: false) {
+                Button(zh ? "重置" : "Reset") {
                     // TODO: reset settings
                 }
                 .buttonStyle(.bordered)
@@ -853,35 +1112,36 @@ struct SessionsSettings: View {
 
     @State private var newConfigName = ""
     @State private var showSaveField = false
+    private var zh: Bool { AppLanguage.current == .chinese }
 
     var body: some View {
-        SettingsCard(title: "Save Current Layout", cardBg: cardBg, borderColor: borderColor) {
+        SettingsCard(title: zh ? "保存当前布局" : "Save Current Layout", cardBg: cardBg, borderColor: borderColor) {
             VStack(spacing: 0) {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Save your current window layout")
+                        Text(zh ? "保存当前窗口布局" : "Save your current window layout")
                             .font(.system(size: 13))
                             .foregroundColor(.white.opacity(0.85))
                         let paneCount = tabManager.tabs.reduce(0) { $0 + $1.splitLayout.paneIds.count }
-                        Text("\(tabManager.tabs.count) tab(s), \(paneCount) pane(s)")
+                        Text(zh ? "\(tabManager.tabs.count) 个标签页, \(paneCount) 个面板" : "\(tabManager.tabs.count) tab(s), \(paneCount) pane(s)")
                             .font(.system(size: 11))
                             .foregroundColor(.white.opacity(0.35))
                     }
                     Spacer()
                     if showSaveField {
                         HStack(spacing: 6) {
-                            TextField("Config name", text: $newConfigName)
+                            TextField(zh ? "配置名称" : "Config name", text: $newConfigName)
                                 .textFieldStyle(.roundedBorder)
                                 .frame(width: 140)
                                 .onSubmit { saveConfig() }
-                            Button("Save") { saveConfig() }
+                            Button(zh ? "保存" : "Save") { saveConfig() }
                                 .buttonStyle(.borderedProminent)
                                 .controlSize(.small)
                                 .tint(accentBlue)
                                 .disabled(newConfigName.isEmpty)
                         }
                     } else {
-                        Button("Save") { showSaveField = true }
+                        Button(zh ? "保存" : "Save") { showSaveField = true }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
                     }
@@ -891,10 +1151,10 @@ struct SessionsSettings: View {
             }
         }
 
-        SettingsCard(title: "Saved Configurations", cardBg: cardBg, borderColor: borderColor) {
+        SettingsCard(title: zh ? "已保存的配置" : "Saved Configurations", cardBg: cardBg, borderColor: borderColor) {
             if launchConfigManager.configurations.isEmpty {
                 HStack {
-                    Text("No saved configurations")
+                    Text(zh ? "没有已保存的配置" : "No saved configurations")
                         .font(.system(size: 13))
                         .foregroundColor(.white.opacity(0.35))
                     Spacer()
@@ -904,9 +1164,9 @@ struct SessionsSettings: View {
             } else {
                 ForEach(Array(launchConfigManager.configurations.enumerated()), id: \.element.id) { index, config in
                     let isLast = index == launchConfigManager.configurations.count - 1
-                    SettingsRow(label: config.name, description: "\(config.tabs.count) tab(s)", showDivider: !isLast) {
+                    SettingsRow(label: config.name, description: zh ? "\(config.tabs.count) 个标签页" : "\(config.tabs.count) tab(s)", showDivider: !isLast) {
                         HStack(spacing: 8) {
-                            Button("Restore") {
+                            Button(zh ? "恢复" : "Restore") {
                                 launchConfigManager.restore(config, tabManager: tabManager)
                             }
                             .buttonStyle(.borderedProminent)
@@ -1020,7 +1280,7 @@ struct AccountSettings: View {
     @State private var showError = false
     @State private var errorText = ""
     @State private var qrCodeField = ""
-    @State private var relayURL: String = UserDefaults.standard.string(forKey: "relayServerURL") ?? "http://127.0.0.1:8766"
+    @State private var relayURL: String = UserDefaults.standard.string(forKey: "relayServerURL") ?? ""
 
     private var zh: Bool { AppLanguage.current == .chinese }
 
@@ -1165,11 +1425,7 @@ struct AccountSettings: View {
                     }
             }
 
-            SettingsRow(label: zh ? "本地服务器" : "Local Server", description: zh ? "终端后端服务" : "Terminal backend", showDivider: false) {
-                Text("ws://127.0.0.1:8765")
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundColor(.white.opacity(0.4))
-            }
+            // 本地服务器信息不展示给用户
         }
     }
 

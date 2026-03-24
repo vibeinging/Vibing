@@ -1,0 +1,32 @@
+# Environment secrets
+.env
+
+# Deploy scripts
+deploy-*.sh
+
+# Rust
+**/target/
+**/*.rs.bk
+
+# Swift
+.build/
+.swiftpm/
+*.xcuserstate
+xcuserdata/
+DerivedData/
+
+# macOS
+.DS_Store
+
+# Android
+**/.gradle/
+**/local.properties
+
+# Build artifacts
+*.ipa
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~

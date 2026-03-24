@@ -67,7 +67,18 @@ class TerminalViewerController: UIViewController {
     private let sendButton = UIButton(type: .system)
     private let quickScroll = UIScrollView()
     private let quickStack = UIStackView()
+    private let smartInsertScroll = UIScrollView()
+    private let smartInsertStack = UIStackView()
     private var inputBarBottom: NSLayoutConstraint!
+
+    // MARK: - File Browser & Command Palette
+
+    private var fileBrowserDimmer: UIView?
+    private var fileBrowserContainer: UIView?
+    private var fileBrowserTable: UITableView?
+    private var fileBrowserEntries: [[String: Any]] = []
+    private var fileBrowserPath: String = "."
+    private weak var fileBrowserPathLabel: UILabel?
     private var isRecording = false
     private let speechRecognizer = SFSpeechRecognizer()
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -143,6 +154,20 @@ class TerminalViewerController: UIViewController {
         if let first = sessions.first {
             selectSession(at: 0, animated: false)
             if sessionCode == "mock" { injectMockOutput(for: first.id) }
+        }
+
+        // Hook into text messages for dir_listing responses (chain with existing handler)
+        let existingHandler = wsClient?.onTextMessage
+        wsClient?.onTextMessage = { [weak self] text in
+            // Forward to existing handler first
+            existingHandler?(text)
+            // Then handle our messages
+            guard let data = text.data(using: .utf8),
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let type = json["type"] as? String else { return }
+            if type == "dir_listing" {
+                self?.handleDirListing(json)
+            }
         }
     }
 
@@ -304,13 +329,44 @@ class TerminalViewerController: UIViewController {
         inputBlur.clipsToBounds = true
         inputBlur.translatesAutoresizingMaskIntoConstraints = false
 
-        // Subtle border
         inputBlur.layer.borderWidth = 0.5
         inputBlur.layer.borderColor = UIColor.white.withAlphaComponent(0.15).cgColor
 
         view.addSubview(inputBlur)
 
-        // Quick actions
+        // ── Row 1: Smart insert buttons (@, /, !, ~) ──
+        smartInsertScroll.showsHorizontalScrollIndicator = false
+        smartInsertScroll.translatesAutoresizingMaskIntoConstraints = false
+        smartInsertStack.axis = .horizontal
+        smartInsertStack.spacing = 6
+        smartInsertStack.translatesAutoresizingMaskIntoConstraints = false
+        smartInsertScroll.addSubview(smartInsertStack)
+
+        let smartItems: [(String, String, Selector)] = [
+            ("@", "doc.text", #selector(smartAtTapped)),
+            ("/", "command", #selector(smartSlashTapped)),
+            ("!", "exclamationmark.triangle", #selector(smartBangTapped)),
+            ("~", "house", #selector(smartTildeTapped)),
+        ]
+
+        for (title, icon, action) in smartItems {
+            let btn = UIButton(type: .system)
+            let config = UIImage.SymbolConfiguration(pointSize: 11, weight: .semibold)
+            let img = UIImage(systemName: icon, withConfiguration: config)
+            btn.setImage(img, for: .normal)
+            btn.setTitle(" " + title, for: .normal)
+            btn.titleLabel?.font = VibingFont.mono(12, weight: .bold)
+            btn.setTitleColor(accent, for: .normal)
+            btn.tintColor = accent
+            btn.backgroundColor = accent.withAlphaComponent(0.12)
+            btn.layer.cornerRadius = 7
+            btn.layer.cornerCurve = .continuous
+            btn.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
+            btn.addTarget(self, action: action, for: .touchUpInside)
+            smartInsertStack.addArrangedSubview(btn)
+        }
+
+        // ── Row 2: Quick actions (⌃C, ⌃D, etc.) ──
         quickScroll.showsHorizontalScrollIndicator = false
         quickScroll.translatesAutoresizingMaskIntoConstraints = false
         quickStack.axis = .horizontal
@@ -323,7 +379,7 @@ class TerminalViewerController: UIViewController {
             quickStack.addArrangedSubview(btn)
         }
 
-        // Input field
+        // ── Row 3: Input field + send ──
         inputField.font = VibingFont.mono(14)
         inputField.textColor = .white
         inputField.backgroundColor = .white.withAlphaComponent(0.12)
@@ -343,20 +399,19 @@ class TerminalViewerController: UIViewController {
         inputField.leftViewMode = .always
         inputField.translatesAutoresizingMaskIntoConstraints = false
 
-        // Mic button
         let micConfig = UIImage.SymbolConfiguration(pointSize: 18, weight: .medium)
         micButton.setImage(UIImage(systemName: "mic.fill", withConfiguration: micConfig), for: .normal)
         micButton.tintColor = .white.withAlphaComponent(0.4)
         micButton.addTarget(self, action: #selector(micTapped), for: .touchUpInside)
         micButton.translatesAutoresizingMaskIntoConstraints = false
 
-        // Send button
         let sendConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .semibold)
         sendButton.setImage(UIImage(systemName: "arrow.up.circle.fill", withConfiguration: sendConfig), for: .normal)
         sendButton.tintColor = accent
         sendButton.addTarget(self, action: #selector(sendTapped), for: .touchUpInside)
         sendButton.translatesAutoresizingMaskIntoConstraints = false
 
+        inputBlur.contentView.addSubview(smartInsertScroll)
         inputBlur.contentView.addSubview(quickScroll)
         inputBlur.contentView.addSubview(inputField)
         inputBlur.contentView.addSubview(micButton)
@@ -369,7 +424,20 @@ class TerminalViewerController: UIViewController {
             inputBlur.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
             inputBarBottom,
 
-            quickScroll.topAnchor.constraint(equalTo: inputBlur.contentView.topAnchor, constant: 8),
+            // Smart insert row (top)
+            smartInsertScroll.topAnchor.constraint(equalTo: inputBlur.contentView.topAnchor, constant: 8),
+            smartInsertScroll.leadingAnchor.constraint(equalTo: inputBlur.contentView.leadingAnchor),
+            smartInsertScroll.trailingAnchor.constraint(equalTo: inputBlur.contentView.trailingAnchor),
+            smartInsertScroll.heightAnchor.constraint(equalToConstant: 28),
+
+            smartInsertStack.topAnchor.constraint(equalTo: smartInsertScroll.topAnchor),
+            smartInsertStack.leadingAnchor.constraint(equalTo: smartInsertScroll.leadingAnchor, constant: 12),
+            smartInsertStack.trailingAnchor.constraint(equalTo: smartInsertScroll.trailingAnchor, constant: -12),
+            smartInsertStack.bottomAnchor.constraint(equalTo: smartInsertScroll.bottomAnchor),
+            smartInsertStack.heightAnchor.constraint(equalTo: smartInsertScroll.heightAnchor),
+
+            // Quick actions row
+            quickScroll.topAnchor.constraint(equalTo: smartInsertScroll.bottomAnchor, constant: 5),
             quickScroll.leadingAnchor.constraint(equalTo: inputBlur.contentView.leadingAnchor),
             quickScroll.trailingAnchor.constraint(equalTo: inputBlur.contentView.trailingAnchor),
             quickScroll.heightAnchor.constraint(equalToConstant: 30),
@@ -380,6 +448,7 @@ class TerminalViewerController: UIViewController {
             quickStack.bottomAnchor.constraint(equalTo: quickScroll.bottomAnchor),
             quickStack.heightAnchor.constraint(equalTo: quickScroll.heightAnchor),
 
+            // Input field row
             inputField.topAnchor.constraint(equalTo: quickScroll.bottomAnchor, constant: 6),
             inputField.leadingAnchor.constraint(equalTo: inputBlur.contentView.leadingAnchor, constant: 12),
             inputField.trailingAnchor.constraint(equalTo: micButton.leadingAnchor, constant: -4),
@@ -1030,6 +1099,213 @@ class TerminalViewerController: UIViewController {
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // MARK: - Smart Insert Actions
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    /// @ — 打开文件选择器
+    @objc private func smartAtTapped() {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        showFileBrowser(path: ".")
+    }
+
+    /// / — 打开命令选择器
+    @objc private func smartSlashTapped() {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        showCommandPalette()
+    }
+
+    /// ! — 插入 ! 到输入框
+    @objc private func smartBangTapped() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        insertTextToInput("! ")
+    }
+
+    /// ~ — 插入 ~ 到输入框
+    @objc private func smartTildeTapped() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        insertTextToInput("~/")
+    }
+
+    private func insertTextToInput(_ text: String) {
+        let current = inputField.text ?? ""
+        inputField.text = current + text
+        inputField.becomeFirstResponder()
+    }
+
+    // MARK: - Command Palette
+
+    private func showCommandPalette() {
+        let commands: [(String, String, String)] = [
+            ("/help", "帮助", "questionmark.circle"),
+            ("/clear", "清屏", "trash"),
+            ("/compact", "压缩上下文", "arrow.down.right.and.arrow.up.left"),
+            ("/commit", "提交代码", "checkmark.circle"),
+            ("/review", "代码审查", "eye"),
+            ("/init", "初始化项目", "folder.badge.plus"),
+            ("/bug", "报告问题", "ladybug"),
+            ("/config", "配置", "gearshape"),
+        ]
+
+        let alert = UIAlertController(title: "Commands", message: nil, preferredStyle: .actionSheet)
+
+        for (cmd, desc, _) in commands {
+            alert.addAction(UIAlertAction(title: "\(cmd)  —  \(desc)", style: .default) { [weak self] _ in
+                self?.insertTextToInput(cmd + " ")
+            })
+        }
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
+        if let popover = alert.popoverPresentationController {
+            popover.sourceView = view
+            popover.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.maxY - 200, width: 0, height: 0)
+        }
+
+        present(alert, animated: true)
+    }
+
+    // MARK: - File Browser
+
+    private func showFileBrowser(path: String) {
+        fileBrowserPath = path
+
+        // Request directory listing from server
+        wsClient?.sendTextMessage([
+            "type": "list_dir",
+            "path": path,
+        ])
+
+        // Build UI if not exists
+        if fileBrowserDimmer == nil {
+            buildFileBrowserUI()
+        }
+
+        // Show with animation
+        fileBrowserDimmer?.isHidden = false
+        fileBrowserContainer?.transform = CGAffineTransform(translationX: 0, y: 400)
+        UIView.animate(withDuration: 0.35, delay: 0, usingSpringWithDamping: 0.85, initialSpringVelocity: 0) {
+            self.fileBrowserDimmer?.alpha = 1
+            self.fileBrowserContainer?.transform = .identity
+        }
+    }
+
+    private func buildFileBrowserUI() {
+        // Dimmer
+        let dimmer = UIView()
+        dimmer.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        dimmer.alpha = 0
+        dimmer.translatesAutoresizingMaskIntoConstraints = false
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissFileBrowser))
+        dimmer.addGestureRecognizer(tap)
+        view.addSubview(dimmer)
+        fileBrowserDimmer = dimmer
+
+        // Container
+        let container = UIView()
+        container.backgroundColor = UIColor(red: 28/255, green: 28/255, blue: 30/255, alpha: 1)
+        container.layer.cornerRadius = 20
+        container.layer.cornerCurve = .continuous
+        container.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        container.clipsToBounds = true
+        container.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(container)
+        fileBrowserContainer = container
+
+        // Header
+        let header = UIView()
+        header.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(header)
+
+        let titleLabel = UILabel()
+        titleLabel.text = "Select File"
+        titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+        titleLabel.textColor = .white
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        header.addSubview(titleLabel)
+
+        let closeBtn = UIButton(type: .system)
+        closeBtn.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
+        closeBtn.tintColor = .white.withAlphaComponent(0.4)
+        closeBtn.addTarget(self, action: #selector(dismissFileBrowser), for: .touchUpInside)
+        closeBtn.translatesAutoresizingMaskIntoConstraints = false
+        header.addSubview(closeBtn)
+
+        // Path label
+        let pathLabel = UILabel()
+        pathLabel.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+        pathLabel.textColor = .white.withAlphaComponent(0.4)
+        pathLabel.translatesAutoresizingMaskIntoConstraints = false
+        header.addSubview(pathLabel)
+        fileBrowserPathLabel = pathLabel
+
+        // Table
+        let table = UITableView(frame: .zero, style: .plain)
+        table.backgroundColor = .clear
+        table.separatorColor = .white.withAlphaComponent(0.06)
+        table.register(UITableViewCell.self, forCellReuseIdentifier: "FileCell")
+        table.delegate = self
+        table.dataSource = self
+        table.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(table)
+        fileBrowserTable = table
+
+        NSLayoutConstraint.activate([
+            dimmer.topAnchor.constraint(equalTo: view.topAnchor),
+            dimmer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            dimmer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            dimmer.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+
+            container.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            container.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            container.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            container.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.55),
+
+            header.topAnchor.constraint(equalTo: container.topAnchor),
+            header.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            header.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            header.heightAnchor.constraint(equalToConstant: 60),
+
+            titleLabel.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: 20),
+            titleLabel.topAnchor.constraint(equalTo: header.topAnchor, constant: 16),
+
+            closeBtn.trailingAnchor.constraint(equalTo: header.trailingAnchor, constant: -16),
+            closeBtn.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
+
+            pathLabel.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: 20),
+            pathLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
+
+            table.topAnchor.constraint(equalTo: header.bottomAnchor),
+            table.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            table.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            table.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+        ])
+    }
+
+    @objc private func dismissFileBrowser() {
+        UIView.animate(withDuration: 0.25, animations: {
+            self.fileBrowserDimmer?.alpha = 0
+            self.fileBrowserContainer?.transform = CGAffineTransform(translationX: 0, y: 400)
+        }) { _ in
+            self.fileBrowserDimmer?.isHidden = true
+        }
+    }
+
+    /// Called when server responds with dir_listing
+    private func handleDirListing(_ data: [String: Any]) {
+        guard let path = data["path"] as? String,
+              let entries = data["entries"] as? [[String: Any]] else { return }
+
+        DispatchQueue.main.async {
+            self.fileBrowserPath = path
+            self.fileBrowserEntries = entries
+
+            self.fileBrowserPathLabel?.text = path
+
+            self.fileBrowserTable?.reloadData()
+        }
+    }
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // MARK: - Keyboard
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -1205,6 +1481,102 @@ extension TerminalViewerController: UIGestureRecognizerDelegate {
             return abs(v.x) > abs(v.y) * 1.5
         }
         return true
+    }
+}
+
+// MARK: - File Browser Table View
+
+extension TerminalViewerController: UITableViewDelegate, UITableViewDataSource {
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        // +1 for ".." parent directory row (unless at root)
+        return fileBrowserEntries.count + (fileBrowserPath == "/" ? 0 : 1)
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "FileCell", for: indexPath)
+        cell.backgroundColor = .clear
+        if cell.selectedBackgroundView == nil {
+            let v = UIView()
+            v.backgroundColor = UIColor.white.withAlphaComponent(0.06)
+            cell.selectedBackgroundView = v
+        }
+
+        let hasParent = fileBrowserPath != "/"
+        let isParentRow = hasParent && indexPath.row == 0
+
+        if isParentRow {
+            cell.imageView?.image = UIImage(systemName: "arrow.up.doc")
+            cell.imageView?.tintColor = .white.withAlphaComponent(0.4)
+            cell.textLabel?.text = ".."
+            cell.textLabel?.textColor = .white.withAlphaComponent(0.5)
+            cell.textLabel?.font = .monospacedSystemFont(ofSize: 14, weight: .regular)
+            cell.accessoryType = .disclosureIndicator
+        } else {
+            let entryIndex = hasParent ? indexPath.row - 1 : indexPath.row
+            guard entryIndex < fileBrowserEntries.count else { return cell }
+            let entry = fileBrowserEntries[entryIndex]
+
+            let name = entry["name"] as? String ?? ""
+            let type = entry["type"] as? String ?? "file"
+            let isDir = type == "dir"
+
+            cell.textLabel?.text = name
+            cell.textLabel?.textColor = .white.withAlphaComponent(isDir ? 0.9 : 0.7)
+            cell.textLabel?.font = .monospacedSystemFont(ofSize: 14, weight: isDir ? .medium : .regular)
+
+            if isDir {
+                cell.imageView?.image = UIImage(systemName: "folder.fill")
+                cell.imageView?.tintColor = VibingColor.accent
+                cell.accessoryType = .disclosureIndicator
+            } else {
+                cell.imageView?.image = UIImage(systemName: "doc.text")
+                cell.imageView?.tintColor = .white.withAlphaComponent(0.4)
+                cell.accessoryType = .none
+            }
+        }
+
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+
+        let hasParent = fileBrowserPath != "/"
+        let isParentRow = hasParent && indexPath.row == 0
+
+        if isParentRow {
+            // Go up
+            let parent = (fileBrowserPath as NSString).deletingLastPathComponent
+            showFileBrowser(path: parent)
+            return
+        }
+
+        let entryIndex = hasParent ? indexPath.row - 1 : indexPath.row
+        guard entryIndex < fileBrowserEntries.count else { return }
+        let entry = fileBrowserEntries[entryIndex]
+        let name = entry["name"] as? String ?? ""
+        let type = entry["type"] as? String ?? "file"
+
+        if type == "dir" {
+            // Navigate into directory
+            let newPath = fileBrowserPath.hasSuffix("/")
+                ? fileBrowserPath + name
+                : fileBrowserPath + "/" + name
+            showFileBrowser(path: newPath)
+        } else {
+            // Select file → insert @path into input
+            let filePath = fileBrowserPath.hasSuffix("/")
+                ? fileBrowserPath + name
+                : fileBrowserPath + "/" + name
+            insertTextToInput("@" + filePath + " ")
+            dismissFileBrowser()
+        }
+    }
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 44
     }
 }
 

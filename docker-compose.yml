@@ -1,0 +1,23 @@
+services:
+  vibing-server:
+    build: ./vibing-macos/vibing-server
+    ports:
+      - "${VIBING_SERVER_BIND:-8765}:8765"
+    environment:
+      - VIBING_AUTH_SECRET=${VIBING_AUTH_SECRET:?Set VIBING_AUTH_SECRET in .env}
+      - VIBING_LOG_LEVEL=${VIBING_LOG_LEVEL:-info}
+    restart: unless-stopped
+
+  vibing-relay:
+    build: ./vibing-relay
+    ports:
+      - "${VIBING_RELAY_BIND:-8766}:8766"
+    environment:
+      - VIBING_AUTH_SECRET=${VIBING_AUTH_SECRET:?Set VIBING_AUTH_SECRET in .env}
+      - VIBING_LOG_LEVEL=${VIBING_LOG_LEVEL:-info}
+    volumes:
+      - relay-data:/data
+    restart: unless-stopped
+
+volumes:
+  relay-data:

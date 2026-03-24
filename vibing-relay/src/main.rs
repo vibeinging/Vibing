@@ -25,6 +25,7 @@ use tokio::sync::{mpsc, RwLock};
 use tower_http::cors::CorsLayer;
 use tracing::{debug, error, info};
 
+mod admin;
 mod api;
 mod auth;
 mod crypto;
@@ -55,6 +56,14 @@ struct Args {
     /// JWT signing secret (also reads VIBE_JWT_SECRET env var)
     #[arg(long, env = "VIBE_JWT_SECRET")]
     jwt_secret: Option<String>,
+
+    /// Admin panel username
+    #[arg(long, env = "VIBE_ADMIN_USER", default_value = "admin")]
+    admin_user: String,
+
+    /// Admin panel password (admin panel disabled if not set)
+    #[arg(long, env = "VIBE_ADMIN_PASS")]
+    admin_pass: Option<String>,
 }
 
 struct RelayState {
@@ -107,6 +116,8 @@ pub struct UserSession {
 pub struct AppState {
     pub db: db::Database,
     pub jwt_secret: String,
+    pub admin_user: String,
+    pub admin_pass: Option<String>,
     relay: RwLock<RelayState>,
     pub online_devices: RwLock<HashMap<String, HashSet<String>>>,
     pub login_attempts: RwLock<HashMap<String, (u32, std::time::Instant)>>,
@@ -151,9 +162,17 @@ async fn main() -> anyhow::Result<()> {
         secret
     });
 
+    if args.admin_pass.is_some() {
+        info!("🔑 Admin panel enabled (user: {})", args.admin_user);
+    } else {
+        info!("ℹ️  Admin panel disabled (set --admin-pass to enable)");
+    }
+
     let state = Arc::new(AppState {
         db: database,
         jwt_secret,
+        admin_user: args.admin_user,
+        admin_pass: args.admin_pass,
         relay: RwLock::new(RelayState::new()),
         online_devices: RwLock::new(HashMap::new()),
         login_attempts: RwLock::new(HashMap::new()),
@@ -194,10 +213,14 @@ async fn main() -> anyhow::Result<()> {
         .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::OPTIONS])
         .allow_headers([axum::http::header::AUTHORIZATION, axum::http::header::CONTENT_TYPE]);
 
-    let app = Router::new()
+    let relay_routes = Router::new()
         .route("/ws", get(ws_handler))
         .route("/health", get(health_handler))
         .merge(api::api_routes())
+        .merge(admin::admin_routes());
+
+    let app = Router::new()
+        .nest("/relay", relay_routes)
         .layer(cors)
         .with_state(state);
 

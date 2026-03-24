@@ -29,13 +29,14 @@ const MSG_TYPE_NEGOTIATE: &str = "negotiate";
 const MSG_TYPE_LIST_SESSIONS: &str = "list_sessions";
 const MSG_TYPE_START_RELAY: &str = "start_relay";
 const MSG_TYPE_STOP_RELAY: &str = "stop_relay";
+const MSG_TYPE_LIST_DIR: &str = "list_dir";
 
 /// 会话数据（存储 session + renderer + 原始字节缓冲）
-struct SessionData {
-    session: Arc<tokio::sync::Mutex<PtySession>>,
-    renderer: Arc<tokio::sync::Mutex<Renderer>>,
+pub(crate) struct SessionData {
+    pub(crate) session: Arc<tokio::sync::Mutex<PtySession>>,
+    pub(crate) renderer: Arc<tokio::sync::Mutex<Renderer>>,
     /// 原始 PTY 输出缓冲区（供 RawStream 客户端使用）
-    raw_buffer: Arc<tokio::sync::Mutex<Vec<u8>>>,
+    pub(crate) raw_buffer: Arc<tokio::sync::Mutex<Vec<u8>>>,
 }
 
 /// 中继桥接数据（一个 PTY 会话对应一个 relay 连接）
@@ -129,6 +130,16 @@ impl TerminalServer {
                 }
             }
         }
+    }
+
+    /// Subscribe to server events (for Hook API)
+    pub fn subscribe_events(&self) -> broadcast::Receiver<ServerEvent> {
+        self.event_tx.subscribe()
+    }
+
+    /// Get shared reference to sessions map (for Hook API input injection)
+    pub fn sessions_ref(&self) -> Arc<DashMap<PtySessionId, SessionData>> {
+        self.sessions.clone()
     }
 
     pub async fn shutdown(&self) -> Result<()> {
@@ -470,7 +481,102 @@ impl TerminalServer {
                 MSG_TYPE_STOP_RELAY => {
                     Self::handle_stop_relay(data, sessions, relay_bridges, clients, client_id).await;
                 }
+                MSG_TYPE_LIST_DIR => {
+                    Self::handle_list_dir(data, clients, client_id).await;
+                }
                 _ => {}
+            }
+        }
+    }
+
+    /// 列出目录内容（供移动端文件选择器使用）
+    async fn handle_list_dir(
+        data: serde_json::Value,
+        clients: &Arc<Mutex<Vec<WebSocketClient>>>,
+        client_id: ClientId,
+    ) {
+        let path = data["path"].as_str().unwrap_or(".");
+
+        // 解析路径：~ 展开为 home 目录
+        let resolved = if path.starts_with('~') {
+            if let Some(home) = std::env::var("HOME").ok() {
+                path.replacen('~', &home, 1)
+            } else {
+                path.to_string()
+            }
+        } else if path == "." {
+            std::env::current_dir()
+                .map(|p| p.to_string_lossy().to_string())
+                .unwrap_or_else(|_| ".".to_string())
+        } else {
+            path.to_string()
+        };
+
+        // 在 blocking 线程中执行文件系统操作，避免阻塞 tokio
+        let resolved_clone = resolved.clone();
+        let result = tokio::task::spawn_blocking(move || {
+            let resolved_path = std::path::Path::new(&resolved_clone);
+
+            if !resolved_path.is_dir() {
+                return Err("Not a directory or does not exist".to_string());
+            }
+
+            let mut entries = Vec::new();
+            if let Ok(read_dir) = std::fs::read_dir(resolved_path) {
+                for entry in read_dir.flatten() {
+                    let name = entry.file_name().to_string_lossy().to_string();
+                    let metadata = entry.metadata().ok();
+                    let is_dir = metadata.as_ref().map(|m| m.is_dir()).unwrap_or(false);
+                    let size = metadata.as_ref().map(|m| m.len()).unwrap_or(0);
+                    let is_hidden = name.starts_with('.');
+
+                    entries.push(serde_json::json!({
+                        "name": name,
+                        "type": if is_dir { "dir" } else { "file" },
+                        "size": size,
+                        "hidden": is_hidden,
+                    }));
+                }
+            }
+
+            entries.sort_by(|a, b| {
+                let a_dir = a["type"].as_str() == Some("dir");
+                let b_dir = b["type"].as_str() == Some("dir");
+                match (a_dir, b_dir) {
+                    (true, false) => std::cmp::Ordering::Less,
+                    (false, true) => std::cmp::Ordering::Greater,
+                    _ => {
+                        let a_name = a["name"].as_str().unwrap_or("");
+                        let b_name = b["name"].as_str().unwrap_or("");
+                        a_name.to_lowercase().cmp(&b_name.to_lowercase())
+                    }
+                }
+            });
+
+            Ok(entries)
+        }).await;
+
+        match result {
+            Ok(Ok(entries)) => {
+                Self::send_text_to_client(clients, client_id, &serde_json::json!({
+                    "type": "dir_listing",
+                    "path": resolved,
+                    "entries": entries,
+                })).await;
+            }
+            Ok(Err(err)) => {
+                Self::send_text_to_client(clients, client_id, &serde_json::json!({
+                    "type": "dir_listing",
+                    "path": path,
+                    "error": err,
+                })).await;
+            }
+            Err(_) => {
+                Self::send_text_to_client(clients, client_id, &serde_json::json!({
+                    "type": "dir_listing",
+                    "path": path,
+                    "error": "Internal error reading directory",
+                })).await;
             }
         }
     }

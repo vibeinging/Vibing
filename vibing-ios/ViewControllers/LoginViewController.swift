@@ -2,7 +2,7 @@
 //  LoginViewController.swift
 //  Vibing (iOS)
 //
-//  登录/注册/扫码登录
+//  登录/注册/扫码登录 — 温暖简约设计
 //
 
 import UIKit
@@ -19,13 +19,14 @@ class LoginViewController: UIViewController {
         let sv = UIScrollView()
         sv.alwaysBounceVertical = true
         sv.keyboardDismissMode = .interactive
+        sv.showsVerticalScrollIndicator = false
         return sv
     }()
 
     private lazy var stack: UIStackView = {
         let s = UIStackView()
         s.axis = .vertical
-        s.spacing = 16
+        s.spacing = VibingSpacing.md  // 16pt 默认间距
         s.alignment = .fill
         return s
     }()
@@ -33,25 +34,21 @@ class LoginViewController: UIViewController {
     private let logoIcon = UIImageView()
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
-    private let serverField = UITextField()
-    private let usernameField = UITextField()
-    private let passwordField = UITextField()
+    private let serverField = VibingTextField()
+    private let usernameField = VibingTextField()
+    private let passwordField = VibingTextField()
     private let errorLabel = UILabel()
-    private let submitBtn = UIButton(type: .system)
+    private let submitBtn = VibingPrimaryButton()
     private let toggleBtn = UIButton(type: .system)
-    private let dividerLabel = UILabel()
-    private let qrBtn = UIButton(type: .system)
+    private let dividerView = UIView()
+    private let qrBtn = VibingSecondaryButton()
     private let spinner = UIActivityIndicatorView(style: .medium)
-
-    // MARK: - Colors
-
-    private let accent = UIColor(red: 106/255, green: 194/255, blue: 120/255, alpha: 1)
 
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = VibingColor.pageBg
         setupViews()
         layoutViews()
         setupActions()
@@ -60,40 +57,43 @@ class LoginViewController: UIViewController {
     // MARK: - Setup
 
     private func setupViews() {
-        // Logo
-        logoIcon.image = UIImage(systemName: "terminal.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 44, weight: .medium))
-        logoIcon.tintColor = accent
+        // Logo — 品牌绿色终端图标
+        logoIcon.image = UIImage(
+            systemName: "terminal.fill",
+            withConfiguration: UIImage.SymbolConfiguration(pointSize: 48, weight: .medium)
+        )
+        logoIcon.tintColor = VibingColor.accent
         logoIcon.contentMode = .scaleAspectFit
 
-        // Title
+        // Title — 大标题，居中
         titleLabel.text = L("login.welcome")
-        titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
+        titleLabel.font = VibingFont.title1()
         titleLabel.textColor = .label
         titleLabel.textAlignment = .center
 
-        // Subtitle
+        // Subtitle — 副标题，柔和色
         subtitleLabel.text = L("login.subtitle")
-        subtitleLabel.font = .systemFont(ofSize: 15)
+        subtitleLabel.font = VibingFont.subheadline()
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.textAlignment = .center
         subtitleLabel.numberOfLines = 0
 
-        // Server URL
-        configureField(serverField, placeholder: L("login.serverPlaceholder"))
+        // Server URL — 等宽字体
+        serverField.setPlaceholder(L("login.serverPlaceholder"))
         serverField.text = UserDefaults.standard.string(forKey: "relayServerURL") ?? ""
         serverField.keyboardType = .URL
-        serverField.font = .monospacedSystemFont(ofSize: 14, weight: .regular)
+        serverField.font = VibingFont.mono(14, weight: .regular)
         serverField.textColor = .secondaryLabel
 
         // Username
-        configureField(usernameField, placeholder: L("login.username"))
+        usernameField.setPlaceholder(L("login.username"))
 
         // Password
-        configureField(passwordField, placeholder: L("login.password"))
+        passwordField.setPlaceholder(L("login.password"))
         passwordField.isSecureTextEntry = true
 
         // Error
-        errorLabel.font = .systemFont(ofSize: 13)
+        errorLabel.font = VibingFont.footnote()
         errorLabel.textColor = .systemRed
         errorLabel.textAlignment = .center
         errorLabel.numberOfLines = 0
@@ -101,50 +101,66 @@ class LoginViewController: UIViewController {
 
         // Submit
         submitBtn.setTitle(L("login.signIn"), for: .normal)
-        submitBtn.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
-        submitBtn.backgroundColor = accent
-        submitBtn.setTitleColor(.white, for: .normal)
-        submitBtn.layer.cornerRadius = 12
 
-        // Toggle
+        // Toggle — 注册/登录切换
         toggleBtn.setTitle(L("login.noAccount"), for: .normal)
-        toggleBtn.titleLabel?.font = .systemFont(ofSize: 13)
+        toggleBtn.titleLabel?.font = VibingFont.footnote()
         toggleBtn.setTitleColor(.secondaryLabel, for: .normal)
 
-        // Divider
-        dividerLabel.text = L("login.or")
-        dividerLabel.font = .systemFont(ofSize: 12)
-        dividerLabel.textColor = .tertiaryLabel
-        dividerLabel.textAlignment = .center
+        // Divider — 带文字的分隔线
+        setupDivider()
 
-        // QR
+        // QR — 扫码登录
         qrBtn.setTitle("  " + L("login.qrScan"), for: .normal)
         qrBtn.setImage(UIImage(systemName: "qrcode.viewfinder"), for: .normal)
-        qrBtn.titleLabel?.font = .systemFont(ofSize: 15, weight: .medium)
         qrBtn.tintColor = .label
-        qrBtn.backgroundColor = .secondarySystemBackground
-        qrBtn.layer.cornerRadius = 12
-        qrBtn.layer.borderWidth = 0.5
-        qrBtn.layer.borderColor = UIColor.separator.cgColor
 
         // Spinner
         spinner.hidesWhenStopped = true
 
-        // Tap to dismiss
+        // Tap to dismiss keyboard
         let tap = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
     }
 
-    private func configureField(_ tf: UITextField, placeholder: String) {
-        tf.placeholder = placeholder
-        tf.font = .systemFont(ofSize: 17)
-        tf.backgroundColor = .secondarySystemBackground
-        tf.layer.cornerRadius = 10
-        tf.autocapitalizationType = .none
-        tf.autocorrectionType = .no
-        tf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 14, height: 0))
-        tf.leftViewMode = .always
+    private func setupDivider() {
+        dividerView.translatesAutoresizingMaskIntoConstraints = false
+
+        let line1 = UIView()
+        line1.backgroundColor = VibingColor.separator
+        line1.translatesAutoresizingMaskIntoConstraints = false
+
+        let label = UILabel()
+        label.text = L("login.or")
+        label.font = VibingFont.caption()
+        label.textColor = .tertiaryLabel
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        let line2 = UIView()
+        line2.backgroundColor = VibingColor.separator
+        line2.translatesAutoresizingMaskIntoConstraints = false
+
+        dividerView.addSubview(line1)
+        dividerView.addSubview(label)
+        dividerView.addSubview(line2)
+
+        NSLayoutConstraint.activate([
+            dividerView.heightAnchor.constraint(equalToConstant: 20),
+            line1.leadingAnchor.constraint(equalTo: dividerView.leadingAnchor),
+            line1.centerYAnchor.constraint(equalTo: dividerView.centerYAnchor),
+            line1.heightAnchor.constraint(equalToConstant: 0.5),
+            line1.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: -12),
+
+            label.centerXAnchor.constraint(equalTo: dividerView.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: dividerView.centerYAnchor),
+
+            line2.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 12),
+            line2.centerYAnchor.constraint(equalTo: dividerView.centerYAnchor),
+            line2.heightAnchor.constraint(equalToConstant: 0.5),
+            line2.trailingAnchor.constraint(equalTo: dividerView.trailingAnchor),
+        ])
     }
 
     private func layoutViews() {
@@ -160,47 +176,57 @@ class LoginViewController: UIViewController {
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
-            stack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: 60),
-            stack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: 24),
-            stack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -24),
-            stack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -40),
+            // 内容居中，左右 margin 24pt，最大宽度 380pt
+            stack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: VibingSpacing.xxl + VibingSpacing.md), // 64pt — 慷慨的顶部呼吸空间
+            stack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: VibingSpacing.lg),
+            stack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -VibingSpacing.lg),
+            stack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -VibingSpacing.xxl),
             stack.widthAnchor.constraint(lessThanOrEqualToConstant: 380),
             stack.centerXAnchor.constraint(equalTo: scrollView.frameLayoutGuide.centerXAnchor),
         ])
 
-        // Add views to stack
-        let spacer = UIView()
-        spacer.heightAnchor.constraint(equalToConstant: 20).isActive = true
-
+        // 视觉节奏：Logo → 标题组（紧凑）→ 输入组（紧凑）→ 操作组（紧凑）→ 分隔 → QR
         stack.addArrangedSubview(logoIcon)
+        stack.setCustomSpacing(VibingSpacing.lg, after: logoIcon)  // 24pt — logo 和标题间宽松
+
         stack.addArrangedSubview(titleLabel)
-        stack.setCustomSpacing(8, after: titleLabel)
+        stack.setCustomSpacing(VibingSpacing.sm, after: titleLabel)  // 8pt — 标题副标题紧凑
+
         stack.addArrangedSubview(subtitleLabel)
-        stack.setCustomSpacing(24, after: subtitleLabel)
+        stack.setCustomSpacing(VibingSpacing.xl, after: subtitleLabel)  // 32pt — 标题组和输入组间慷慨分隔
+
         stack.addArrangedSubview(serverField)
-        stack.setCustomSpacing(16, after: serverField)
+        stack.setCustomSpacing(VibingSpacing.md, after: serverField)  // 16pt
+
         stack.addArrangedSubview(usernameField)
+        stack.setCustomSpacing(VibingSpacing.sm, after: usernameField)  // 8pt — 输入框间紧凑
+
         stack.addArrangedSubview(passwordField)
+        stack.setCustomSpacing(VibingSpacing.sm, after: passwordField)  // 8pt
+
         stack.addArrangedSubview(errorLabel)
+
         stack.addArrangedSubview(submitBtn)
+        stack.setCustomSpacing(VibingSpacing.sm, after: submitBtn)  // 8pt
+
         stack.addArrangedSubview(toggleBtn)
-        stack.setCustomSpacing(24, after: toggleBtn)
-        stack.addArrangedSubview(dividerLabel)
+        stack.setCustomSpacing(VibingSpacing.xl, after: toggleBtn)  // 32pt — 操作组和 QR 组间慷慨分隔
+
+        stack.addArrangedSubview(dividerView)
+        stack.setCustomSpacing(VibingSpacing.md, after: dividerView)  // 16pt
+
         stack.addArrangedSubview(qrBtn)
 
-        // Heights
-        logoIcon.heightAnchor.constraint(equalToConstant: 60).isActive = true
-        serverField.heightAnchor.constraint(equalToConstant: 44).isActive = true
-        usernameField.heightAnchor.constraint(equalToConstant: 48).isActive = true
-        passwordField.heightAnchor.constraint(equalToConstant: 48).isActive = true
-        submitBtn.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        qrBtn.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        // Logo 高度
+        logoIcon.heightAnchor.constraint(equalToConstant: 64).isActive = true
 
-        // Spinner on submit button
-        spinner.translatesAutoresizingMaskIntoConstraints = false
+        // Spinner 叠加在 submit 按钮上
         submitBtn.addSubview(spinner)
-        spinner.centerYAnchor.constraint(equalTo: submitBtn.centerYAnchor).isActive = true
-        spinner.trailingAnchor.constraint(equalTo: submitBtn.trailingAnchor, constant: -16).isActive = true
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            spinner.centerYAnchor.constraint(equalTo: submitBtn.centerYAnchor),
+            spinner.trailingAnchor.constraint(equalTo: submitBtn.trailingAnchor, constant: -20),
+        ])
     }
 
     // MARK: - Actions
@@ -212,15 +238,18 @@ class LoginViewController: UIViewController {
     }
 
     @objc private func submitTapped() {
-        guard let username = usernameField.text, !username.isEmpty,
-              let password = passwordField.text, !password.isEmpty else {
+        let server = serverField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let username = usernameField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let password = passwordField.text ?? ""
+
+        guard !username.isEmpty, !password.isEmpty else {
             showError(L("login.fillFields"))
             return
         }
 
         // 保存服务器地址
-        if let url = serverField.text, !url.isEmpty {
-            UserDefaults.standard.set(url, forKey: "relayServerURL")
+        if !server.isEmpty {
+            UserDefaults.standard.set(server, forKey: "relayServerURL")
         }
 
         setLoading(true)
@@ -248,101 +277,65 @@ class LoginViewController: UIViewController {
 
     @objc private func toggleTapped() {
         isRegistering.toggle()
-        errorLabel.isHidden = true
-        UIView.animate(withDuration: 0.25) {
-            self.submitBtn.setTitle(self.isRegistering ? L("login.createAccount") : L("login.signIn"), for: .normal)
+        UIView.animate(withDuration: 0.2) {
+            self.submitBtn.setTitle(
+                self.isRegistering ? L("login.register") : L("login.signIn"),
+                for: .normal
+            )
             self.toggleBtn.setTitle(
                 self.isRegistering ? L("login.hasAccount") : L("login.noAccount"),
-                for: .normal)
-            self.dividerLabel.alpha = self.isRegistering ? 0 : 1
-            self.qrBtn.alpha = self.isRegistering ? 0 : 1
+                for: .normal
+            )
         }
     }
 
     @objc private func qrTapped() {
-        // 优先选择方式
-        let sheet = UIAlertController(title: L("login.qrTitle"), message: nil, preferredStyle: .actionSheet)
-
-        // 摄像头扫码
-        sheet.addAction(UIAlertAction(title: L("login.qrScanCamera"), style: .default) { [weak self] _ in
-            self?.openCameraScanner()
-        })
-
-        // 手动输入
-        sheet.addAction(UIAlertAction(title: L("login.qrManualInput"), style: .default) { [weak self] _ in
-            self?.showManualQRInput()
-        })
-
-        sheet.addAction(UIAlertAction(title: L("login.cancel"), style: .cancel))
-        sheet.view.tintColor = accent
-
-        if let popover = sheet.popoverPresentationController {
-            popover.sourceView = qrBtn
-            popover.sourceRect = qrBtn.bounds
-        }
-        present(sheet, animated: true)
-    }
-
-    private func openCameraScanner() {
-        let scanner = QRScannerSimpleController { [weak self] result in
-            guard let self = self else { return }
-            self.dismiss(animated: true)
-
-            guard let url = URL(string: result),
-                  let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-                  let params = components.queryItems else {
-                // 不是 URL 格式，尝试当作纯 code
-                self.performQRLogin(code: result)
-                return
-            }
-
-            let server = params.first(where: { $0.name == "server" })?.value
-            let code = params.first(where: { $0.name == "code" })?.value
-
-            if let server = server, let code = code {
-                UserDefaults.standard.set(server, forKey: "relayServerURL")
-                self.serverField.text = server
-                self.performQRLogin(code: code)
-            } else {
-                self.performQRLogin(code: result)
+        let scanner = QRScannerSimpleController { [weak self] code in
+            self?.dismiss(animated: true) {
+                self?.handleQRCode(code)
             }
         }
-        scanner.modalPresentationStyle = .fullScreen
         present(scanner, animated: true)
     }
 
-    private func showManualQRInput() {
-        let alert = UIAlertController(title: L("login.qrTitle"), message: L("login.qrMessage"), preferredStyle: .alert)
-        alert.addTextField { $0.placeholder = "VIBE_QR|..."; $0.autocapitalizationType = .none }
-        alert.addAction(UIAlertAction(title: L("login.cancel"), style: .cancel))
-        alert.addAction(UIAlertAction(title: L("login.login"), style: .default) { [weak self] _ in
-            guard let code = alert.textFields?.first?.text, !code.isEmpty else { return }
-            self?.performQRLogin(code: code)
-        })
-        alert.view.tintColor = accent
-        present(alert, animated: true)
-    }
+    private func handleQRCode(_ code: String) {
+        guard let url = URL(string: code),
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let server = components.queryItems?.first(where: { $0.name == "server" })?.value,
+              let qrCode = components.queryItems?.first(where: { $0.name == "code" })?.value
+        else {
+            showError("Invalid QR code")
+            return
+        }
 
-    private func performQRLogin(code: String) {
-        setLoading(true)
-        Task {
-            do {
-                try await account.qrLogin(code: code)
-                await MainActor.run { setLoading(false); onLoginSuccess?() }
-            } catch {
-                await MainActor.run { setLoading(false); showError(error.localizedDescription) }
+        let loading = QRLoginLoadingViewController(server: server, code: qrCode)
+        loading.onSuccess = { [weak self] in
+            self?.dismiss(animated: true) {
+                self?.onLoginSuccess?()
             }
         }
+        present(loading, animated: true)
     }
 
-    private func setLoading(_ on: Bool) {
-        submitBtn.isEnabled = !on
-        qrBtn.isEnabled = !on
-        on ? spinner.startAnimating() : spinner.stopAnimating()
-    }
+    // MARK: - Helpers
 
-    private func showError(_ msg: String) {
-        errorLabel.text = msg
+    private func showError(_ text: String) {
+        errorLabel.text = text
         errorLabel.isHidden = false
+        // 微妙的抖动动画
+        let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
+        animation.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        animation.duration = 0.4
+        animation.values = [-8, 6, -4, 2, 0]
+        errorLabel.layer.add(animation, forKey: "shake")
+    }
+
+    private func setLoading(_ loading: Bool) {
+        submitBtn.isEnabled = !loading
+        if loading {
+            spinner.startAnimating()
+        } else {
+            spinner.stopAnimating()
+        }
     }
 }

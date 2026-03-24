@@ -347,7 +347,7 @@ class RelayAPIClient {
     static let shared = RelayAPIClient()
 
     var baseURL: String {
-        UserDefaults.standard.string(forKey: "relayServerURL") ?? "http://127.0.0.1:8766"
+        UserDefaults.standard.string(forKey: "relayServerURL") ?? ""
     }
 
     private init() {}
